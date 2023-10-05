@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "esbuild": "^0.17.19",
+    "purescript": "^0.15.9",
+    "rimraf": "^5.0.0",
+    "sass": "^1.51.0",
+    "spago": "^0.21.0",
+    "tailwindcss": "^3.3.2"
+  },
+  "scripts": {
+    "clean": "rimraf output && rimraf .spago",
+    "build": "spago bundle-app --to dist/bundle.js",
+    "buildcss": "sass --no-source-map src/style.scss dist/bundle.css",
+    "buildtw": "tailwindcss -i src/tailwind.css -o dist/tailwind.css"
+  }
+}
