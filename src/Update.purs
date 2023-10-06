@@ -9,14 +9,16 @@ import Data.Argonaut.Parser (jsonParser)
 import GraphParams.Graph (Edge(..))
 import GraphParams.Graph as Graph
 import GraphParams.Layout (computeLayout)
-import GraphParams.Model (Algorithm(..), EditMode(..), Model, Dialog(..),
-      _graphs, currentGraph, nbVertices, runColoring, stringToOrdering)
+import GraphParams.Model (Algorithm(..), Dialog(..), EditMode(..), Model, _graphs, currentGraph, nbVertices, runColoring, stringToOrdering)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (pointerDecoder, storageGet, storagePut)
 import Pha.Update (Update)
 import Web.Event.Event (stopPropagation)
 import Web.PointerEvent.PointerEvent as PE
 import Web.UIEvent.MouseEvent as ME
+
+cleanResults :: Model -> Model
+cleanResults = _ { results = [], currentResultIndex = 0, currentStep = 0 }
 
 update ∷ Msg → Update Model Msg Aff Unit
 update (AddVertex ev) = do
@@ -26,7 +28,7 @@ update (AddVertex ev) = do
     Just p →
       modify_ \model →
         if model.editmode == VertexMode then
-          model # _graphs <<< ix model.currentGraphId %~ Graph.addVertex p
+          cleanResults $ model # _graphs <<< ix model.currentGraphId %~ Graph.addVertex p
         else
           model
 
@@ -41,7 +43,9 @@ update (SelectVertex i ev) = do
 update (GraphMove ev) = do
   pos ← liftEffect $ pointerDecoder (PE.toMouseEvent ev)
   modify_ \model → case pos, model.editmode, model.selectedVertex of
-    Just p, MoveMode, Just i → model # _graphs <<< ix model.currentGraphId %~ Graph.moveVertex i p
+    Just p, MoveMode, Just i → model 
+                                # _graphs <<< ix model.currentGraphId %~ Graph.moveVertex i p
+                                # cleanResults
     Just p, AddEMode, _ → model { currentPosition = Just p }
     _, _, _ → model
 
@@ -55,7 +59,7 @@ update DropOrLeave =
 update (PointerUp i) = do
   modify_ \model → case model.editmode, model.selectedVertex of
     MoveMode, _ → model { selectedVertex = Nothing, currentPosition = Nothing }
-    AddEMode, Just j → (model # _graphs <<< ix model.currentGraphId %~ Graph.addEdge i j) { selectedVertex = Nothing }
+    AddEMode, Just j → cleanResults $ (model # _graphs <<< ix model.currentGraphId %~ Graph.addEdge i j) { selectedVertex = Nothing }
     _, _ → model
 
 update (DeleteVertex i ev) = do
@@ -64,21 +68,27 @@ update (DeleteVertex i ev) = do
     (liftEffect $ stopPropagation $ ME.toEvent ev)
   modify_ \model →
     if model.editmode == DeleteMode then
-      model # _graphs <<< ix model.currentGraphId %~ Graph.removeVertex i
+      model
+        # _graphs <<< ix model.currentGraphId %~ Graph.removeVertex i
+        # cleanResults
     else
       model 
 
 update (DeleteEdge (Edge u v)) =
   modify_ \model →
     if model.editmode == DeleteMode then
-      model # _graphs <<< ix model.currentGraphId %~ Graph.removeEdge u v
+      model
+        # _graphs <<< ix model.currentGraphId %~ Graph.removeEdge u v
+        # cleanResults
     else
       model
 
-update ClearGraph = modify_ \model -> model # _graphs <<< ix model.currentGraphId .~ { layout: [], edges: [] }
-
-update GenBigGraph = modify_ \model -> model # _graphs <<< ix model.currentGraphId .~ Graph.bigGraph
-
+update ClearGraph = modify_ \model -> model 
+                                        # _graphs <<< ix model.currentGraphId .~ { layout: [], edges: [] }
+                                        # cleanResults
+update GenBigGraph = modify_ \model -> model 
+                                        # _graphs <<< ix model.currentGraphId .~ Graph.bigGraph
+                                        # cleanResults
 update (SetEditMode mode) = modify_ _ { editmode = mode }
 
 update AdjustGraph = modify_ \model → model # _graphs <<< ix model.currentGraphId %~ \graph ->
@@ -93,7 +103,7 @@ update (SetGraph str) =
         "3" -> 2
         "4" -> 3
         _ -> 0
-    } 
+    } # cleanResults 
 
 update (SetAlgo name) =
   modify_ \model →

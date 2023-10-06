@@ -56,7 +56,7 @@ type Model =
 
 init ∷ Model
 init =
-  { selectedAlgorithm: DSatur
+  { selectedAlgorithm: Alphabetical
   , results: []
   , currentStep: 0
   , currentResultIndex: 0
