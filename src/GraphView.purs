@@ -3,7 +3,7 @@ module GraphParams.GraphView where
 import Relude
 
 import GraphParams.Graph as Graph
-import GraphParams.Model (Model, Position, EditMode(..), currentGraph, partialColoring)
+import GraphParams.Model (Model, Position, EditMode(..), currentGraph, partialColoring, labelToString)
 import GraphParams.Msg (Msg(..))
 import GraphParams.UI as UI
 import GraphParams.Util (map2)
@@ -68,7 +68,12 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
                         ]
               , S.g [] $
                   layout # mapWithIndex \idx {x, y} ->
-                        S.text [H.class_ "pointer-events-none graphview-text", SA.x (100.0 * x), SA.y (100.0 * y)] [ H.text $ show $ idx + 1 ]
+                        S.text 
+                          [ H.class_ "pointer-events-none graphview-text"
+                          , SA.x (100.0 * x)
+                          , SA.y (100.0 * y)
+                          ]
+                          [ H.text $ labelToString idx ]
               , H.when (editmode == AddEMode) \_ →
                   H.fromMaybe case selectedVertex of
                     Just v → currentLine <$> currentPosition <*> Graph.getCoords graph v
@@ -76,11 +81,11 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
               ]
           ]
       , UI.buttonGroup
-          [ { name: "Move", onClick: SetEditMode MoveMode, attrs: [ P.selected $ editmode == MoveMode] }
-          , { name: "Add vertex", onClick: SetEditMode VertexMode, attrs: [ P.selected $ editmode == VertexMode ] }
-          , { name: "Add edge", onClick: SetEditMode AddEMode, attrs: [ P.selected $ editmode == AddEMode ] } 
-          , { name: "Remove", onClick: SetEditMode DeleteMode, attrs: [ P.selected $ editmode == DeleteMode] }
-          , { name: "Clear", onClick: ClearGraph, attrs: [ ] }
-          , { name: "Adjust", onClick: AdjustGraph, attrs: [ ] }
+          [ { name: "Déplacer", onClick: SetEditMode MoveMode, attrs: [ P.selected $ editmode == MoveMode] }
+          , { name: "Ajouter sommet", onClick: SetEditMode VertexMode, attrs: [ P.selected $ editmode == VertexMode ] }
+          , { name: "Ajouter arête", onClick: SetEditMode AddEMode, attrs: [ P.selected $ editmode == AddEMode ] } 
+          , { name: "Retirer", onClick: SetEditMode DeleteMode, attrs: [ P.selected $ editmode == DeleteMode] }
+          , { name: "Tout effacer", onClick: ClearGraph, attrs: [ ] }
+          , { name: "Ajuster", onClick: AdjustGraph, attrs: [ ] }
           ]
       ]

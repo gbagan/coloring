@@ -9,7 +9,8 @@ import Data.Argonaut.Parser (jsonParser)
 import GraphParams.Graph (Edge(..))
 import GraphParams.Graph as Graph
 import GraphParams.Layout (computeLayout)
-import GraphParams.Model (Algorithm(..), EditMode(..), Model, Dialog(..), _graphs, currentGraph, nbVertices, runColoring)
+import GraphParams.Model (Algorithm(..), EditMode(..), Model, Dialog(..),
+      _graphs, currentGraph, nbVertices, runColoring, stringToOrdering)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (pointerDecoder, storageGet, storagePut)
 import Pha.Update (Update)
@@ -101,7 +102,15 @@ update (SetAlgo name) =
         "dsatur" -> DSatur
         "custom" -> CustomAlgorithm (0 .. (nbVertices model - 1))
         _ -> Alphabetical
-    } 
+    }
+
+update (CustomAlgoTextChange text) =
+  modify_ \model →
+    case stringToOrdering text of
+      Nothing → model
+      Just ord -> model { selectedAlgorithm = CustomAlgorithm ord }
+    
+update (SetResultIndex idx) = modify_ _ {currentResultIndex = idx, currentStep = 0}
 
 update Save = do
   model ← get
@@ -144,7 +153,7 @@ update Compute =
       graph = currentGraph model
       coloring = runColoring graph selectedAlgorithm
     in
-    model { results = take 5 $ results `snoc` { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) } }
+    model { results = take 5 $ cons { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) } results }
 
 update PreviousStep =
   modify_ \model -> model { currentStep = max 0 (model.currentStep-1) }

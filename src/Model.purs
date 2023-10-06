@@ -3,7 +3,7 @@ module GraphParams.Model where
 import Relude
 
 import Data.Char (fromCharCode, toCharCode)
-import Data.String.CodeUnits (fromCharArray)
+import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
 import GraphParams.Coloring (Coloring, alphabeticalColoring, customColoring, decreasingDegreeColoring, dsatur)
 import GraphParams.Graph (Graph, toAdjGraph)
 
@@ -23,8 +23,15 @@ data Dialog
   | ExportDialog String
   | ImportDialog String
 
+labelToString :: Int -> String
+labelToString = singleton <<< fromMaybe 'A' <<< \n -> fromCharCode (n + toCharCode 'A')
+
 orderingToString :: Array Int -> String
 orderingToString = fromCharArray <<< catMaybes <<< map \n -> fromCharCode (n + toCharCode 'A')
+
+stringToOrdering :: String -> Maybe (Array Int)
+stringToOrdering text = Just $ text # toCharArray # map (\c -> toCharCode c - toCharCode 'A')
+-- todo
 
 algoToString :: Algorithm -> String
 algoToString Alphabetical = "alphabétique"

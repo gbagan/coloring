@@ -18,6 +18,8 @@ data Msg
   | AdjustGraph
   | SetGraph String
   | SetAlgo String
+  | CustomAlgoTextChange String
+  | SetResultIndex Int
   | Save
   | Load
   | OpenImportDialog

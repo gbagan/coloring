@@ -33,10 +33,10 @@ importDialog text = UI.dialog "Importer les graphes" [body] buttons
     ]
 
 view ∷ Model → Html Msg
-view model@{ dialog, selectedAlgorithm, results } =
+view model@{ dialog, selectedAlgorithm, results, currentResultIndex } =
   H.div [ H.class_ "flex flex-row justify-between" ]
     [ H.div [ H.class_ "w-3/4" ]
-        [ UI.card "Graph" [graphView model] ]
+        [ UI.card "Graphe" [graphView model] ]
     , H.div [ H.class_ "flex flex-col graphparams-help-container" ]
         [ H.text "Graphe"
         , H.select [H.class_ UI.selectClass, P.value "1",  E.onValueChange SetGraph]
@@ -63,13 +63,17 @@ view model@{ dialog, selectedAlgorithm, results } =
                 [ H.class_ UI.textInputClass
                 , P.type_ "text"
                 , P.value $ orderingToString ord
+                , E.onValueChange CustomAlgoTextChange
                 ]
             _ -> H.empty
         , UI.button {onClick: Compute, name: "Calculer", attrs: [] }
         , H.text "Résultats"
         , H.div [H.class_ "flex flex-col"] $
-            results <#> \{algorithm, number} ->
-              H.div []
+            results # mapWithIndex \idx {algorithm, number} ->
+              H.div
+                [ H.class' "text-blue-600" $ currentResultIndex == idx
+                , E.onClick \_ -> SetResultIndex idx
+                ]
                 [ H.text $ algoToString algorithm <> "(" <> show number <> ")" ]
         , UI.buttonGroup 
             [ {onClick: PreviousStep, name: "Etape précédente", attrs: [] }
