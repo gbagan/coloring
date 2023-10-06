@@ -4,6 +4,7 @@ import Relude
 import Data.Array (modifyAtIndices)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
+import GraphParams.Util (repeat, pseudoRandom)
 
 data Edge
   = Edge Int Int
@@ -80,9 +81,16 @@ addEdge u v graph =
         graph.edges `snoc` (u ↔ v)
     }
 
-toAdjGraph :: Graph → AdjGraph
+toAdjGraph ∷ Graph → AdjGraph
 toAdjGraph g =
   foldr
     (\(u ↔ v) → modifyAtIndices [ u ] (_ `snoc` v) <<< modifyAtIndices [ v ] (_ `snoc` u))
     (g.layout <#> const [])
     g.edges
+
+bigGraph ∷ Graph
+bigGraph =
+  { layout: repeat 100 \i → { x: pseudoRandom (i * 2), y: pseudoRandom (i * 2 + 1) }
+  , edges: (repeat 1000 \i → floor (100.0 * pseudoRandom (i * 2)) ↔ floor (100.0 * pseudoRandom (i * 2 + 1)))
+            # filter \(u ↔ v) → u /= v
+  }

@@ -16,6 +16,7 @@ data Msg
   | SetEditMode EditMode
   | ClearGraph
   | AdjustGraph
+  | GenBigGraph
   | SetGraph String
   | SetAlgo String
   | CustomAlgoTextChange String

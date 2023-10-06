@@ -4,6 +4,7 @@
   , "argonaut-core"
   , "arrays"
   , "integers"
+  , "numbers"
   , "pha"
   , "relude"
   , "strings"

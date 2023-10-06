@@ -3,16 +3,16 @@ module GraphParams.GraphView where
 import Relude
 
 import GraphParams.Graph as Graph
-import GraphParams.Model (Model, Position, EditMode(..), currentGraph, partialColoring, labelToString)
+import GraphParams.Model (Model, Position, EditMode(..), currentGraph, nbVertices, partialColoring, labelToString)
 import GraphParams.Msg (Msg(..))
 import GraphParams.UI as UI
 import GraphParams.Util (map2)
 import Pha.Html (Html)
 import Pha.Html as H
-import Pha.Svg as S
-import Pha.Svg.Attributes as SA
 import Pha.Html.Attributes as P
 import Pha.Html.Events as E
+import Pha.Svg as S
+import Pha.Svg.Attributes as SA
 
 
 currentLine ∷ ∀ a. Position → Position → Html a
@@ -28,6 +28,7 @@ currentLine p1 p2 =
 graphView ∷ Model → Html Msg
 graphView model@{ editmode, currentPosition, selectedVertex } =
   let
+    n = nbVertices model
     graph@{ layout, edges } = currentGraph model
     vertexColor = partialColoring model
   in
@@ -59,19 +60,21 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
                       S.circle
                         [ SA.cx $ 100.0 * x
                         , SA.cy $ 100.0 * y
-                        , SA.r 2.3
+                        , SA.r 4
+                        , SA.strokeWidth 0.5
                         , H.class_ $ "graphparams-graphview-vertex color" <> show color
                         , H.class' "deletemode" $ editmode == DeleteMode
                         , E.onClick (DeleteVertex i)
                         , E.onPointerDown (SelectVertex i)
                         , E.onPointerUp \_ → PointerUp i
                         ]
-              , S.g [] $
-                  layout # mapWithIndex \idx {x, y} ->
+              , H.when (n <= 26) \_ ->
+                  S.g [] $
+                    layout # mapWithIndex \idx {x, y} ->
                         S.text 
                           [ H.class_ "pointer-events-none graphview-text"
-                          , SA.x (100.0 * x)
-                          , SA.y (100.0 * y)
+                          , SA.x (100.0 * x - 2.0)
+                          , SA.y (100.0 * y + 2.0)
                           ]
                           [ H.text $ labelToString idx ]
               , H.when (editmode == AddEMode) \_ →
@@ -87,5 +90,6 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
           , { name: "Retirer", onClick: SetEditMode DeleteMode, attrs: [ P.selected $ editmode == DeleteMode] }
           , { name: "Tout effacer", onClick: ClearGraph, attrs: [ ] }
           , { name: "Ajuster", onClick: AdjustGraph, attrs: [ ] }
+          , { name: "Gros graphe", onClick: GenBigGraph, attrs: [ ] }
           ]
       ]

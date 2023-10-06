@@ -21,10 +21,11 @@
 }
 
 .graphparams-graphview-vertex {
-    fill: black;
+    stroke: black;
+    fill: white;
 
     &.color0 {
-        fill: blue;
+         fill: blue;
     }
 
     &.color1 {
@@ -32,7 +33,7 @@
     }
 
     &.color2 {
-        fill: green;
+        fill: lightgreen;
     }
 
     &.color3 {
@@ -47,6 +48,22 @@
         fill: magenta;
     }
 
+    &.color6 {
+        fill: yellow;
+    }
+
+    &.color7 {
+        fill: green;
+    }
+
+    &.color8 {
+        fill: purple;
+    }
+
+    &.color9 {
+        fill: gold;
+    }
+
     &.deletemode:hover {
         fill: gray;
     }
@@ -54,7 +71,7 @@
 
 .graphparams-graphview-edge {
     stroke: blue;
-    stroke-width: 1;
+    stroke-width: 0.5;
 
     &.deletemode:hover {
         stroke: gray;
@@ -62,6 +79,6 @@
 }
 
 .graphview-text {
-    font: bold 7px sans-serif;
-    fill: red;
+    font: bold 6px sans-serif;
+    fill: black;
 }

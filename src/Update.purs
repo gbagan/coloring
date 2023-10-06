@@ -77,6 +77,8 @@ update (DeleteEdge (Edge u v)) =
 
 update ClearGraph = modify_ \model -> model # _graphs <<< ix model.currentGraphId .~ { layout: [], edges: [] }
 
+update GenBigGraph = modify_ \model -> model # _graphs <<< ix model.currentGraphId .~ Graph.bigGraph
+
 update (SetEditMode mode) = modify_ _ { editmode = mode }
 
 update AdjustGraph = modify_ \model → model # _graphs <<< ix model.currentGraphId %~ \graph ->
