@@ -1,6 +1,6 @@
 module GraphParams.View (view) where
 
-import Prelude
+import Relude
 
 import GraphParams.GraphView (graphView)
 import GraphParams.Model (Model, Algorithm(..), algoToString, orderingToString)
@@ -18,12 +18,13 @@ view model@{ selectedAlgorithm, results } =
         [ UI.card "Graph" [graphView model] ]
     , H.div [ H.class_ "flex flex-col graphparams-help-container" ]
         [ H.text "Graphe"
-        , H.select [H.class_ UI.selectClass, P.value "1"]
+        , H.select [H.class_ UI.selectClass, P.value "1",  E.onValueChange SetGraph]
             [ H.option [P.value "1"] [H.text "Graphe 1"]
             , H.option [P.value "2"] [H.text "Graphe 2"]
             , H.option [P.value "3"] [H.text "Graphe 3"]
             , H.option [P.value "4"] [H.text "Graphe 4"]
             ]
+        , UI.button {onClick: Save, name: "Sauvegarder", attrs: [] }
         , H.text "Algorithme"
         , H.select [H.class_ UI.selectClass, P.name "dsatur", E.onValueChange SetAlgo]
             [ H.option [P.value "alpha"] [H.text "Alphabetique"]

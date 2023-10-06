@@ -1,20 +1,20 @@
 module GraphParams.Update where
 
-import Prelude
+import Relude
 
-import Data.Array ((..), elem, length, take, snoc)
-import Data.Foldable (maximum)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
+import Data.Argonaut.Core (stringify)
+import Data.Argonaut.Decode (decodeJson)
+import Data.Argonaut.Encode (encodeJson)
+import Data.Argonaut.Parser (jsonParser)
 import GraphParams.Graph (Edge(..))
 import GraphParams.Graph as Graph
 import GraphParams.Layout (computeLayout)
-import GraphParams.Model (Algorithm(..), EditMode(..), Model, nbVertices, runColoring)
+import GraphParams.Model (Algorithm(..), EditMode(..), Model, _graphs, currentGraph, nbVertices, runColoring)
 import GraphParams.Msg (Msg(..))
-import Pha.Update (Update, get, modify_)
-import Util (pointerDecoder)
+import GraphParams.Util (pointerDecoder, storageGet, storagePut)
+import Pha.Update (Update)
 import Web.Event.Event (stopPropagation)
+import Web.HTML.Event.EventTypes (offline)
 import Web.PointerEvent.PointerEvent as PE
 import Web.UIEvent.MouseEvent as ME
 
@@ -26,7 +26,7 @@ update (AddVertex ev) = do
     Just p →
       modify_ \model →
         if model.editmode == VertexMode then
-          model { graph = Graph.addVertex p model.graph }
+          model # _graphs <<< ix model.currentGraphId %~ Graph.addVertex p
         else
           model
 
@@ -41,7 +41,7 @@ update (SelectVertex i ev) = do
 update (GraphMove ev) = do
   pos ← liftEffect $ pointerDecoder (PE.toMouseEvent ev)
   modify_ \model → case pos, model.editmode, model.selectedVertex of
-    Just p, MoveMode, Just i → model { graph = Graph.moveVertex i p model.graph }
+    Just p, MoveMode, Just i → model # _graphs <<< ix model.currentGraphId %~ Graph.moveVertex i p
     Just p, AddEMode, _ → model { currentPosition = Just p }
     _, _, _ → model
 
@@ -55,7 +55,7 @@ update DropOrLeave =
 update (PointerUp i) = do
   modify_ \model → case model.editmode, model.selectedVertex of
     MoveMode, _ → model { selectedVertex = Nothing, currentPosition = Nothing }
-    AddEMode, Just j → model { graph = Graph.addEdge i j model.graph, selectedVertex = Nothing }
+    AddEMode, Just j → (model # _graphs <<< ix model.currentGraphId %~ Graph.addEdge i j) { selectedVertex = Nothing }
     _, _ → model
 
 update (DeleteVertex i ev) = do
@@ -64,22 +64,34 @@ update (DeleteVertex i ev) = do
     (liftEffect $ stopPropagation $ ME.toEvent ev)
   modify_ \model →
     if model.editmode == DeleteMode then
-      model { graph = Graph.removeVertex i model.graph }
+      model # _graphs <<< ix model.currentGraphId %~ Graph.removeVertex i
     else
       model
 
 update (DeleteEdge (Edge u v)) =
   modify_ \model →
     if model.editmode == DeleteMode then
-      model { graph = Graph.removeEdge u v model.graph }
+      model # _graphs <<< ix model.currentGraphId %~ Graph.removeEdge u v
     else
       model
 
-update ClearGraph = modify_ _ { graph = { layout: [], edges: [] } }
+update ClearGraph = modify_ \model -> model # _graphs <<< ix model.currentGraphId .~ { layout: [], edges: [] }
 
 update (SetEditMode mode) = modify_ \model → model { editmode = mode }
 
-update AdjustGraph = modify_ \model@{ graph } → model { graph = graph { layout = computeLayout (length $ graph.layout) graph.edges } }
+update AdjustGraph = modify_ \model → model # _graphs <<< ix model.currentGraphId %~ \graph ->
+                      graph { layout = computeLayout (length $ graph.layout) graph.edges }
+
+update (SetGraph str) =
+  modify_ \model →
+    model { currentGraphId = 
+      case str of
+        "1" -> 0
+        "2" -> 1
+        "3" -> 2
+        "4" -> 3
+        _ -> 0
+    } 
 
 update (SetAlgo name) =
   modify_ \model →
@@ -92,10 +104,28 @@ update (SetAlgo name) =
         _ -> Alphabetical
     } 
 
+update Save = do
+  model ← get
+  storagePut "coloring-graphs" $ stringify (encodeJson model.graphs)
+
+update Load = do
+  mtext <- storageGet "coloring-graphs"
+  case mtext of
+    Nothing -> pure unit
+    Just text ->
+      case jsonParser text of
+        Left _ → pure unit
+        Right json →
+          case decodeJson json of
+            Left _ -> pure unit
+            Right graphs -> modify_ _ { graphs = graphs }
 
 update Compute =
-  modify_ \model@{ graph, selectedAlgorithm, results } →
-    let coloring = runColoring graph selectedAlgorithm in
+  modify_ \model@{ selectedAlgorithm, results } →
+    let
+      graph = currentGraph model
+      coloring = runColoring graph selectedAlgorithm
+    in
     model { results = take 5 $ results `snoc` { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) } }
 
 update PreviousStep =

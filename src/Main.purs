@@ -1,21 +1,17 @@
 module Main where
 
-import Prelude
+import Relude hiding (view)
 
-import Control.Monad.Reader (runReaderT)
-import Data.Maybe (Maybe(..))
-import Effect (Effect)
-import Effect.Aff (launchAff_)
-import Effect.Class (liftEffect)
 import GraphParams.Model (init)
 import GraphParams.Update (update)
+import GraphParams.Msg (Msg(..))
 import GraphParams.View (view)
 import Pha.App (app)
 
 main ∷ Effect Unit
 main =
   app
-    { init: { model: init, msg: Nothing }
+    { init: { model: init, msg: Just Load }
     , update
     , view
     , selector: "#root"

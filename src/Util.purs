@@ -1,13 +1,13 @@
-module Util where
+module GraphParams.Util where
 
-import Prelude
+import Relude
 import Data.Int as Int
-import Data.Array (zipWith, mapWithIndex)
-import Data.Maybe (Maybe(..))
-import Effect (Effect)
 import Web.UIEvent.MouseEvent as ME
 import Web.Event.Event as E
 import Web.DOM.Element as Element
+import Web.HTML (window)
+import Web.HTML.Window (localStorage)
+import Web.Storage.Storage as Storage
 
 map2 ∷ ∀a b c. Array a → Array b → (Int → a → b → c) → Array c
 map2 t1 t2 fn = zipWith ($) (mapWithIndex fn t1) t2
@@ -25,3 +25,9 @@ pointerDecoder ev = do
                 y: (Int.toNumber(ME.clientY ev) - top) / height
             }
         _ → pure Nothing
+
+storagePut ∷ ∀ m. MonadAff m => String → String → m Unit
+storagePut name value = liftEffect $ window >>= localStorage >>= Storage.setItem name value
+
+storageGet ∷ ∀ m. MonadAff m => String → m (Maybe String)
+storageGet name = liftEffect $ window >>= localStorage >>= Storage.getItem name

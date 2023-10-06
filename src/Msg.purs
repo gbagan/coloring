@@ -16,7 +16,10 @@ data Msg
   | SetEditMode EditMode
   | ClearGraph
   | AdjustGraph
+  | SetGraph String
   | SetAlgo String
+  | Save
+  | Load
   | Compute
   | PreviousStep
   | NextStep

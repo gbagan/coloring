@@ -1,20 +1,19 @@
 module GraphParams.GraphView where
 
-import Prelude
+import Relude
 
-import Data.Array (mapWithIndex)
-import Data.Maybe (Maybe(..))
 import GraphParams.Graph as Graph
-import GraphParams.Model (Model, Position, EditMode(..), partialColoring)
+import GraphParams.Model (Model, Position, EditMode(..), currentGraph, partialColoring)
 import GraphParams.Msg (Msg(..))
 import GraphParams.UI as UI
+import GraphParams.Util (map2)
 import Pha.Html (Html)
 import Pha.Html as H
 import Pha.Svg as S
 import Pha.Svg.Attributes as SA
 import Pha.Html.Attributes as P
 import Pha.Html.Events as E
-import Util (map2)
+
 
 currentLine ∷ ∀ a. Position → Position → Html a
 currentLine p1 p2 =
@@ -27,8 +26,9 @@ currentLine p1 p2 =
     ]
 
 graphView ∷ Model → Html Msg
-graphView model@{ graph: graph@{ layout, edges }, editmode, currentPosition, selectedVertex } =
+graphView model@{ editmode, currentPosition, selectedVertex } =
   let
+    graph@{ layout, edges } = currentGraph model
     vertexColor = partialColoring model
   in
     H.div []

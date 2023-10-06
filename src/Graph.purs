@@ -1,9 +1,9 @@
 module GraphParams.Graph where
 
-import Prelude
-import Data.Array ((!!), deleteAt, elem, filter, foldr, mapMaybe, snoc, modifyAtIndices, updateAtIndices)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Tuple.Nested ((/\))
+import Relude
+import Data.Array (modifyAtIndices)
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 
 data Edge
   = Edge Int Int
@@ -12,6 +12,15 @@ infix 3 Edge as ↔
 
 instance Eq Edge where
   eq (u1 ↔ v1) (u2 ↔ v2) = u1 == u2  && v1 == v2 || u1 == v2 && u2 == v1
+
+
+instance EncodeJson Edge where
+  encodeJson (u ↔ v) = encodeJson (u /\ v)
+
+instance DecodeJson Edge where
+  decodeJson json = do
+    (u /\ v) <- decodeJson json
+    pure (u ↔ v)
 
 incident ∷ Int → Edge → Boolean
 incident v (u1 ↔ v1) = v == u1 || v == v1

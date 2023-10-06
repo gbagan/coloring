@@ -17,6 +17,31 @@ let additions =
         , repo = "https://github.com/gbagan/purescript-pha.git"
         , version = "master"
         }
+      , relude =
+        { dependencies =
+          [ "aff"
+          , "arrays"
+          , "control"
+          , "effect"
+          , "either"
+          , "foldable-traversable"
+          , "generate-values"
+          , "integers"
+          , "lazy"
+          , "lists"
+          , "maybe"
+          , "numbers"
+          , "ordered-collections"
+          , "prelude"
+          , "profunctor-lenses"
+          , "transformers"
+          , "tuples"
+          , "unfoldable"
+          ]
+        , repo = "https://github.com/gbagan/purescript-relude.git"
+        , version = "master"
+        }
       }
+
 
 in      upstream // additions

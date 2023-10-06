@@ -1,12 +1,9 @@
 module GraphParams.Model where
 
-import Prelude
+import Relude
 
-import Data.Array ((!!), catMaybes, length, replicate, take, updateAtIndices)
 import Data.Char (fromCharCode, toCharCode)
 import Data.String.CodeUnits (fromCharArray)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Tuple.Nested ((/\))
 import GraphParams.Coloring (Coloring, alphabeticalColoring, customColoring, decreasingDegreeColoring, dsatur)
 import GraphParams.Graph (Graph, toAdjGraph)
 
@@ -26,14 +23,15 @@ algoToString DecreasingDegree = "degré décroissant"
 algoToString DSatur = "DSatur"
 algoToString (CustomAlgorithm ord) = orderingToString ord
 
-type Result = { algorithm :: Algorithm, coloring :: Coloring, number :: Int }
+type Result = { algorithm ∷ Algorithm, coloring ∷ Coloring, number ∷ Int }
 
 type Model =
   { selectedAlgorithm ∷ Algorithm
   , results ∷ Array Result
   , currentStep ∷ Int
   , currentResultIndex ∷ Int
-  , graph ∷ Graph
+  , graphs ∷ Array Graph
+  , currentGraphId ∷ Int
   , editmode ∷ EditMode
   , selectedVertex ∷ Maybe Int
   , currentPosition ∷ Maybe Position
@@ -45,18 +43,28 @@ init =
   , results: []
   , currentStep: 0
   , currentResultIndex: 0
-  , graph: {layout: [], edges: []}
+  , graphs: replicate 4 {layout: [], edges: []}
+  , currentGraphId: 0
   , editmode: VertexMode
   , selectedVertex: Nothing
   , currentPosition: Nothing
   }
 
-nbVertices :: Model -> Int
-nbVertices {graph} = length graph.layout
+currentGraph ∷ Model -> Graph
+currentGraph {graphs, currentGraphId} =
+  fromMaybe {layout: [], edges: []} $ graphs !! currentGraphId
 
-partialColoring :: Model -> Array Int
-partialColoring {graph, currentStep, results, currentResultIndex} =
-  let emptyColoring = replicate (length graph.layout) (-1)
+_graphs :: Lens' Model (Array Graph)
+_graphs = prop (Proxy :: _"graphs")
+
+nbVertices ∷ Model -> Int
+nbVertices model = length (currentGraph model).layout
+
+partialColoring ∷ Model -> Array Int
+partialColoring model@{currentStep, results, currentResultIndex} =
+  let
+    graph = currentGraph model
+    emptyColoring = replicate (length graph.layout) (-1)
   in
   fromMaybe emptyColoring do
     {coloring} <- results !! currentResultIndex
@@ -71,3 +79,4 @@ runColoring graph algo =
     DecreasingDegree -> decreasingDegreeColoring adjGraph
     DSatur -> dsatur adjGraph
     CustomAlgorithm ordering -> customColoring adjGraph ordering
+

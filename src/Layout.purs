@@ -2,12 +2,7 @@ module GraphParams.Layout
   ( computeLayout
   ) where
 
-import Prelude
-import Data.Array ((..), foldl, mapWithIndex, notElem)
-import Data.Foldable (minimum, maximum)
-import Data.Int (toNumber)
-import Data.Maybe (fromMaybe)
-import Data.Number (pi, sqrt, cos, sin)
+import Relude hiding (force)
 import GraphParams.Graph (Edge(..), Position)
 
 initialRadius ∷ Number
@@ -63,7 +58,7 @@ force alpha beta edges layout =
           springForces =
             layout
               # mapWithIndex \j { x: x', y: y' } →
-                  if Edge i j `notElem` edges then
+                  if not (Edge i j `elem` edges) then
                     { x: 0.0, y: 0.0 }
                   else
                     let

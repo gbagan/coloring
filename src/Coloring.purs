@@ -1,7 +1,6 @@
 module GraphParams.Coloring where
 
-import Prelude
-import Data.Array ((..), (!!), length, sortWith)
+import Relude
 import GraphParams.Graph (AdjGraph)
 
 type Coloring = Array { vertex :: Int, color :: Int }
