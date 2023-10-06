@@ -5,6 +5,7 @@ import Relude
 import GraphParams.GraphView (graphView)
 import GraphParams.Model (Model, Algorithm(..), Dialog(..), algoToString, orderingToString)
 import GraphParams.Msg (Msg(..))
+import GraphParams.Util (repeat)
 import GraphParams.UI as UI
 import Pha.Html (Html)
 import Pha.Html as H
@@ -33,12 +34,11 @@ importDialog text = UI.dialog "Importer les graphes" [body] buttons
     ]
 
 view ∷ Model → Html Msg
-view model@{ dialog, selectedAlgorithm, results, currentResultIndex } =
-  H.div [ H.class_ "flex flex-row justify-between" ]
-    [ H.div [ H.class_ "w-3/4" ]
-        [ UI.card "Graphe" [graphView model] ]
+view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
+  H.div [ H.class_ "flex flex-row justify-around" ]
+    [ UI.card "Graphe" [graphView model]
     , H.div [ H.class_ "flex flex-col graphparams-help-container" ]
-        [ H.text "Graphe"
+        [ H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Graphe"]
         , H.select [H.class_ UI.selectClass, P.value "1",  E.onValueChange SetGraph]
             [ H.option [P.value "1"] [H.text "Graphe 1"]
             , H.option [P.value "2"] [H.text "Graphe 2"]
@@ -50,7 +50,7 @@ view model@{ dialog, selectedAlgorithm, results, currentResultIndex } =
             , {onClick: OpenImportDialog, name: "Importer", attrs: [] }
             , {onClick: Export, name: "Exporter", attrs: [] }
             ]
-        , H.text "Algorithme"
+        , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Algorithme"]
         , H.select [H.class_ UI.selectClass, P.name "dsatur", E.onValueChange SetAlgo]
             [ H.option [P.value "alpha"] [H.text "Alphabetique"]
             , H.option [P.value "decdegree"] [H.text "Degré décroissant"]
@@ -67,14 +67,15 @@ view model@{ dialog, selectedAlgorithm, results, currentResultIndex } =
                 ]
             _ -> H.empty
         , UI.button {onClick: Compute, name: "Calculer", attrs: [] }
-        , H.text "Résultats"
-        , H.div [H.class_ "flex flex-col"] $
-            results # mapWithIndex \idx {algorithm, number} ->
-              H.div
-                [ H.class' "text-blue-600" $ currentResultIndex == idx
+        , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Résultats"]
+        , H.ul [H.class_ "ml-4 list-disc"] $
+            (results # mapWithIndex \idx {algorithm, number} ->
+              H.li
+                [ H.class' "text-blue-600" $ selectedResultIndex == idx
                 , E.onClick \_ -> SetResultIndex idx
                 ]
-                [ H.text $ algoToString algorithm <> "(" <> show number <> ")" ]
+                [ H.text $ algoToString algorithm <> " (" <> show number <> " couleurs)" ]
+            ) <> (repeat (5 - length results) \_ -> H.li [] [])
         , UI.buttonGroup 
             [ {onClick: PreviousStep, name: "Etape précédente", attrs: [] }
             , {onClick: NextStep, name: "Etape suivante", attrs: [] }

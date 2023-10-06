@@ -2,6 +2,7 @@ module GraphParams.Model where
 
 import Relude
 
+import Data.Lens.AffineTraversal (AffineTraversal', affineTraversal)
 import Data.Char (fromCharCode, toCharCode)
 import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
 import GraphParams.Coloring (Coloring, alphabeticalColoring, customColoring, decreasingDegreeColoring, dsatur)
@@ -45,9 +46,9 @@ type Model =
   { selectedAlgorithm ∷ Algorithm
   , results ∷ Array Result
   , currentStep ∷ Int
-  , currentResultIndex ∷ Int
+  , selectedResultIndex ∷ Int
   , graphs ∷ Array Graph
-  , currentGraphId ∷ Int
+  , selectedGraphIdx ∷ Int
   , editmode ∷ EditMode
   , selectedVertex ∷ Maybe Int
   , currentPosition ∷ Maybe Position
@@ -59,33 +60,44 @@ init =
   { selectedAlgorithm: Alphabetical
   , results: []
   , currentStep: 0
-  , currentResultIndex: 0
+  , selectedResultIndex: 0
   , graphs: replicate 4 {layout: [], edges: []}
-  , currentGraphId: 0
-  , editmode: VertexMode
+  , selectedGraphIdx: 0
+  , editmode: MoveMode
   , selectedVertex: Nothing
   , currentPosition: Nothing
   , dialog: NoDialog
   }
 
-currentGraph ∷ Model -> Graph
-currentGraph {graphs, currentGraphId} =
-  fromMaybe {layout: [], edges: []} $ graphs !! currentGraphId
+selectedGraph ∷ Model -> Graph
+selectedGraph {graphs, selectedGraphIdx} =
+  fromMaybe {layout: [], edges: []} $ graphs !! selectedGraphIdx
 
 _graphs :: Lens' Model (Array Graph)
 _graphs = prop (Proxy :: _"graphs")
 
+
+_selectedGraph :: AffineTraversal' Model Graph
+_selectedGraph = affineTraversal set pre
+  where
+  set :: Model -> Graph -> Model
+  set model@{graphs, selectedGraphIdx} b =
+    model { graphs = fromMaybe graphs $ updateAt selectedGraphIdx b graphs }
+
+  pre :: Model -> Either Model Graph
+  pre model = maybe (Left model) Right $ model.graphs !! model.selectedGraphIdx
+
 nbVertices ∷ Model -> Int
-nbVertices model = length (currentGraph model).layout
+nbVertices model = length (selectedGraph model).layout
 
 partialColoring ∷ Model -> Array Int
-partialColoring model@{currentStep, results, currentResultIndex} =
+partialColoring model@{currentStep, results, selectedResultIndex} =
   let
-    graph = currentGraph model
+    graph = selectedGraph model
     emptyColoring = replicate (length graph.layout) (-1)
   in
   fromMaybe emptyColoring do
-    {coloring} <- results !! currentResultIndex
+    {coloring} <- results !! selectedResultIndex
     let pcoloring = take currentStep coloring # map \{vertex, color} -> vertex /\ color
     pure $ updateAtIndices pcoloring emptyColoring
 

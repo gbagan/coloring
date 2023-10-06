@@ -6,6 +6,7 @@
   , "integers"
   , "numbers"
   , "pha"
+  , "profunctor-lenses"
   , "relude"
   , "strings"
   , "web-dom"

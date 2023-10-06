@@ -9,7 +9,8 @@ import Data.Argonaut.Parser (jsonParser)
 import GraphParams.Graph (Edge(..))
 import GraphParams.Graph as Graph
 import GraphParams.Layout (computeLayout)
-import GraphParams.Model (Algorithm(..), Dialog(..), EditMode(..), Model, _graphs, currentGraph, nbVertices, runColoring, stringToOrdering)
+import GraphParams.Model (Algorithm(..), Dialog(..), EditMode(..), Model, _selectedGraph
+                        , selectedGraph, nbVertices, runColoring, stringToOrdering)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (pointerDecoder, storageGet, storagePut)
 import Pha.Update (Update)
@@ -18,7 +19,7 @@ import Web.PointerEvent.PointerEvent as PE
 import Web.UIEvent.MouseEvent as ME
 
 cleanResults :: Model -> Model
-cleanResults = _ { results = [], currentResultIndex = 0, currentStep = 0 }
+cleanResults = _ { results = [], selectedResultIndex = 0, currentStep = 0 }
 
 update ∷ Msg → Update Model Msg Aff Unit
 update (AddVertex ev) = do
@@ -28,7 +29,7 @@ update (AddVertex ev) = do
     Just p →
       modify_ \model →
         if model.editmode == VertexMode then
-          cleanResults $ model # _graphs <<< ix model.currentGraphId %~ Graph.addVertex p
+          cleanResults $ model # _selectedGraph %~ Graph.addVertex p
         else
           model
 
@@ -44,7 +45,7 @@ update (GraphMove ev) = do
   pos ← liftEffect $ pointerDecoder (PE.toMouseEvent ev)
   modify_ \model → case pos, model.editmode, model.selectedVertex of
     Just p, MoveMode, Just i → model 
-                                # _graphs <<< ix model.currentGraphId %~ Graph.moveVertex i p
+                                # _selectedGraph %~ Graph.moveVertex i p
                                 # cleanResults
     Just p, AddEMode, _ → model { currentPosition = Just p }
     _, _, _ → model
@@ -59,7 +60,7 @@ update DropOrLeave =
 update (PointerUp i) = do
   modify_ \model → case model.editmode, model.selectedVertex of
     MoveMode, _ → model { selectedVertex = Nothing, currentPosition = Nothing }
-    AddEMode, Just j → cleanResults $ (model # _graphs <<< ix model.currentGraphId %~ Graph.addEdge i j) { selectedVertex = Nothing }
+    AddEMode, Just j → cleanResults $ (model # _selectedGraph %~ Graph.addEdge i j) { selectedVertex = Nothing }
     _, _ → model
 
 update (DeleteVertex i ev) = do
@@ -69,7 +70,7 @@ update (DeleteVertex i ev) = do
   modify_ \model →
     if model.editmode == DeleteMode then
       model
-        # _graphs <<< ix model.currentGraphId %~ Graph.removeVertex i
+        # _selectedGraph %~ Graph.removeVertex i
         # cleanResults
     else
       model 
@@ -78,25 +79,25 @@ update (DeleteEdge (Edge u v)) =
   modify_ \model →
     if model.editmode == DeleteMode then
       model
-        # _graphs <<< ix model.currentGraphId %~ Graph.removeEdge u v
+        # _selectedGraph %~ Graph.removeEdge u v
         # cleanResults
     else
       model
 
 update ClearGraph = modify_ \model -> model 
-                                        # _graphs <<< ix model.currentGraphId .~ { layout: [], edges: [] }
+                                        # _selectedGraph .~ { layout: [], edges: [] }
                                         # cleanResults
 update GenBigGraph = modify_ \model -> model 
-                                        # _graphs <<< ix model.currentGraphId .~ Graph.bigGraph
+                                        # _selectedGraph .~ Graph.bigGraph
                                         # cleanResults
 update (SetEditMode mode) = modify_ _ { editmode = mode }
 
-update AdjustGraph = modify_ \model → model # _graphs <<< ix model.currentGraphId %~ \graph ->
+update AdjustGraph = modify_ \model → model # _selectedGraph %~ \graph ->
                       graph { layout = computeLayout (length $ graph.layout) graph.edges }
 
 update (SetGraph str) =
   modify_ \model →
-    model { currentGraphId =
+    model { selectedGraphIdx =
       case str of
         "1" -> 0
         "2" -> 1
@@ -122,7 +123,7 @@ update (CustomAlgoTextChange text) =
       Nothing → model
       Just ord -> model { selectedAlgorithm = CustomAlgorithm ord }
     
-update (SetResultIndex idx) = modify_ _ {currentResultIndex = idx, currentStep = 0}
+update (SetResultIndex idx) = modify_ _ {selectedResultIndex = idx, currentStep = 0}
 
 update Save = do
   model ← get
@@ -152,17 +153,17 @@ update ImportAndClose = modify_ \model →
         Right json →
           case decodeJson json of
             Left _ -> model { dialog = NoDialog}
-            Right graphs -> model { dialog = NoDialog, graphs = graphs }
+            Right graph -> (model # _selectedGraph .~ graph) { dialog = NoDialog }
     _ -> model
 
-update Export = modify_ \model → model { dialog = ExportDialog $ stringify (encodeJson model.graphs)}
+update Export = modify_ \model → model { dialog = ExportDialog $ stringify (encodeJson (selectedGraph model))}
 
 update CloseDialog = modify_ _ { dialog = NoDialog}
 
 update Compute =
   modify_ \model@{ selectedAlgorithm, results } →
     let
-      graph = currentGraph model
+      graph = selectedGraph model
       coloring = runColoring graph selectedAlgorithm
     in
     model { results = take 5 $ cons { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) } results }

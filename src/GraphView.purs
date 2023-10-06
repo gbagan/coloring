@@ -3,7 +3,7 @@ module GraphParams.GraphView where
 import Relude
 
 import GraphParams.Graph as Graph
-import GraphParams.Model (Model, Position, EditMode(..), currentGraph, nbVertices, partialColoring, labelToString)
+import GraphParams.Model (Model, Position, EditMode(..), selectedGraph, nbVertices, partialColoring, labelToString)
 import GraphParams.Msg (Msg(..))
 import GraphParams.UI as UI
 import GraphParams.Util (map2)
@@ -29,7 +29,7 @@ graphView ∷ Model → Html Msg
 graphView model@{ editmode, currentPosition, selectedVertex } =
   let
     n = nbVertices model
-    graph@{ layout, edges } = currentGraph model
+    graph@{ layout, edges } = selectedGraph model
     vertexColor = partialColoring model
   in
     H.div []
