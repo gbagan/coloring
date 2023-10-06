@@ -51,3 +51,20 @@ textInputClass = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounde
 
 selectClass ∷ String
 selectClass = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+
+dialog ∷ ∀msg. String → Array (Html msg) → Array { name :: String, onClick :: msg } → Html msg
+dialog title body buttons =
+  H.div [ H.class_ "absolute w-full h-full flex items-center justify-center bg-transp-grey inset-0 z-50" ]
+    [ H.div [ H.class_ "bg-white text-black rounded block border-2" ]
+        [ H.div [ H.class_ "p-4 min-h-8 border-b-2" ]
+            [ H.div [ H.class_ "text-4xl font-medium inline-block" ] [ H.text title ]
+            ]
+        , H.div [ H.class_ "p-6 border-b-2" ] body
+        , H.div [ H.class_ "p-4 text-right" ] $ 
+            buttons # mapWithIndex \i {name, onClick} ->
+              H.button
+                [ H.class_ $ buttonClass <> (if i == 0 then "" else " ml-4")
+                , E.onClick \_ -> onClick
+                ] [ H.text name ]
+        ]
+    ]

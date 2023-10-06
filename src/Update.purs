@@ -9,12 +9,11 @@ import Data.Argonaut.Parser (jsonParser)
 import GraphParams.Graph (Edge(..))
 import GraphParams.Graph as Graph
 import GraphParams.Layout (computeLayout)
-import GraphParams.Model (Algorithm(..), EditMode(..), Model, _graphs, currentGraph, nbVertices, runColoring)
+import GraphParams.Model (Algorithm(..), EditMode(..), Model, Dialog(..), _graphs, currentGraph, nbVertices, runColoring)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (pointerDecoder, storageGet, storagePut)
 import Pha.Update (Update)
 import Web.Event.Event (stopPropagation)
-import Web.HTML.Event.EventTypes (offline)
 import Web.PointerEvent.PointerEvent as PE
 import Web.UIEvent.MouseEvent as ME
 
@@ -66,7 +65,7 @@ update (DeleteVertex i ev) = do
     if model.editmode == DeleteMode then
       model # _graphs <<< ix model.currentGraphId %~ Graph.removeVertex i
     else
-      model
+      model 
 
 update (DeleteEdge (Edge u v)) =
   modify_ \model →
@@ -77,14 +76,14 @@ update (DeleteEdge (Edge u v)) =
 
 update ClearGraph = modify_ \model -> model # _graphs <<< ix model.currentGraphId .~ { layout: [], edges: [] }
 
-update (SetEditMode mode) = modify_ \model → model { editmode = mode }
+update (SetEditMode mode) = modify_ _ { editmode = mode }
 
 update AdjustGraph = modify_ \model → model # _graphs <<< ix model.currentGraphId %~ \graph ->
                       graph { layout = computeLayout (length $ graph.layout) graph.edges }
 
 update (SetGraph str) =
   modify_ \model →
-    model { currentGraphId = 
+    model { currentGraphId =
       case str of
         "1" -> 0
         "2" -> 1
@@ -119,6 +118,25 @@ update Load = do
           case decodeJson json of
             Left _ -> pure unit
             Right graphs -> modify_ _ { graphs = graphs }
+
+update OpenImportDialog = modify_ \model → model { dialog = ImportDialog ""}
+
+update (ChangeImportText text) = modify_ \model → model { dialog = ImportDialog text}
+
+update ImportAndClose = modify_ \model →
+  case model.dialog of
+    ImportDialog text →
+      case jsonParser text of
+        Left _ → model { dialog = NoDialog}
+        Right json →
+          case decodeJson json of
+            Left _ -> model { dialog = NoDialog}
+            Right graphs -> model { dialog = NoDialog, graphs = graphs }
+    _ -> model
+
+update Export = modify_ \model → model { dialog = ExportDialog $ stringify (encodeJson model.graphs)}
+
+update CloseDialog = modify_ _ { dialog = NoDialog}
 
 update Compute =
   modify_ \model@{ selectedAlgorithm, results } →

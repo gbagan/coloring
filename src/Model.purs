@@ -12,7 +12,16 @@ derive instance Eq EditMode
 
 type Position = { x ∷ Number, y ∷ Number}
 
-data Algorithm = Alphabetical | DecreasingDegree | DSatur | CustomAlgorithm (Array Int)
+data Algorithm 
+  = Alphabetical
+  | DecreasingDegree
+  | DSatur
+  | CustomAlgorithm (Array Int)
+
+data Dialog
+  = NoDialog
+  | ExportDialog String
+  | ImportDialog String
 
 orderingToString :: Array Int -> String
 orderingToString = fromCharArray <<< catMaybes <<< map \n -> fromCharCode (n + toCharCode 'A')
@@ -35,6 +44,7 @@ type Model =
   , editmode ∷ EditMode
   , selectedVertex ∷ Maybe Int
   , currentPosition ∷ Maybe Position
+  , dialog ∷ Dialog
   }
 
 init ∷ Model
@@ -48,6 +58,7 @@ init =
   , editmode: VertexMode
   , selectedVertex: Nothing
   , currentPosition: Nothing
+  , dialog: NoDialog
   }
 
 currentGraph ∷ Model -> Graph

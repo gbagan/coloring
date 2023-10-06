@@ -20,6 +20,11 @@ data Msg
   | SetAlgo String
   | Save
   | Load
+  | OpenImportDialog
+  | Export
+  | ChangeImportText String
+  | ImportAndClose
+  | CloseDialog
   | Compute
   | PreviousStep
   | NextStep
