@@ -4,5 +4,6 @@ package-lock.json
 node_modules
 dist/bundle*
 dist/worker.js
-output
+output/
+output-es/
 dist/worker*
