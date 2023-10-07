@@ -11,6 +11,8 @@ import Pha.Html (Html)
 import Pha.Html as H
 import Pha.Html.Attributes as P
 import Pha.Html.Events as E
+import Pha.Svg as S
+import Pha.Svg.Attributes as SA
 
 exportDialog ∷ String → Html Msg
 exportDialog text = UI.dialog "Exporter les graphes" [body] buttons
@@ -37,6 +39,13 @@ view ∷ Model → Html Msg
 view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
   H.div [ H.class_ "flex flex-row justify-around" ]
     [ UI.card "Graphe" [graphView model]
+    , UI.card "Ordre des couleurs"
+      [ H.div [H.class_ "w-16"]
+          [ S.svg [SA.viewBox 0.0 0.0 10.0 100.0] $
+              (0..9) <#> \i ->
+                S.rect [SA.x 0, SA.y $ i * 10, SA.width 10, SA.height 10, H.class_ $ "color" <> show i]
+          ]
+      ]
     , H.div [ H.class_ "flex flex-col graphparams-help-container" ]
         [ H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Graphe"]
         , H.select [H.class_ UI.selectClass, P.value "1",  E.onValueChange SetGraph]
@@ -54,6 +63,7 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
         , H.select [H.class_ UI.selectClass, P.name "dsatur", E.onValueChange SetAlgo]
             [ H.option [P.value "alpha"] [H.text "Alphabetique"]
             , H.option [P.value "decdegree"] [H.text "Degré décroissant"]
+            , H.option [P.value "welsh"] [H.text "Welsh and Powell"]
             , H.option [P.value "dsatur"] [H.text "DSatur"]
             , H.option [P.value "custom"] [H.text "Personnalisé"]
             ]

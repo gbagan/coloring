@@ -45,3 +45,21 @@ export const dsatur = graph => {
     }
     return result
 }
+
+export const welshPowellImpl = graph => order => {
+    const result = []
+    let color = 0
+    while(result.length < graph.length) {
+        const adjArray = new Array(graph.length)
+        adjArray.fill(false)
+        for (const v of order) {
+            if (adjArray[v])
+                continue
+            result.push({ vertex: v, color})
+            for (const u of graph[v])
+                adjArray[u] = true
+        }
+        color++
+    }
+    return result
+}

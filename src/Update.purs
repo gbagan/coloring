@@ -112,6 +112,7 @@ update (SetAlgo name) =
       case name of
         "alpha" -> Alphabetical
         "decdegree" -> DecreasingDegree
+        "welsh" -> WelshPowell
         "dsatur" -> DSatur
         "custom" -> CustomAlgorithm (0 .. (nbVertices model - 1))
         _ -> Alphabetical

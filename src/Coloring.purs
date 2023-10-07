@@ -18,3 +18,11 @@ decreasingDegreeColoring [] = []
 decreasingDegreeColoring graph = customColoring graph ordering
     where
     ordering = 0 .. (length graph - 1) # sortWith \u -> negate <$> length <$> graph !! u
+
+foreign import welshPowellImpl :: AdjGraph -> Array Int -> Coloring
+
+welshPowell :: AdjGraph -> Coloring
+welshPowell [] = []
+welshPowell graph = welshPowellImpl graph ordering
+    where
+    ordering = 0 .. (length graph - 1) # sortWith \u -> negate <$> length <$> graph !! u

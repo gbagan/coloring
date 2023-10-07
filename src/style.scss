@@ -24,49 +24,50 @@
     stroke: black;
     fill: white;
 
-    &.color0 {
-         fill: blue;
-    }
-
-    &.color1 {
-        fill: red;
-    }
-
-    &.color2 {
-        fill: lightgreen;
-    }
-
-    &.color3 {
-        fill: orange;
-    }
-
-    &.color4 {
-        fill: cyan;
-    }
-
-    &.color5 {
-        fill: magenta;
-    }
-
-    &.color6 {
-        fill: yellow;
-    }
-
-    &.color7 {
-        fill: green;
-    }
-
-    &.color8 {
-        fill: purple;
-    }
-
-    &.color9 {
-        fill: gold;
-    }
-
     &.deletemode:hover {
         fill: gray;
     }
+}
+
+
+.color0 {
+    fill: blue;
+}
+
+.color1 {
+   fill: red;
+}
+
+.color2 {
+   fill: lightgreen;
+}
+
+.color3 {
+   fill: orange;
+}
+
+.color4 {
+   fill: cyan;
+}
+
+.color5 {
+   fill: magenta;
+}
+
+.color6 {
+   fill: yellow;
+}
+
+.color7 {
+   fill: green;
+}
+
+.color8 {
+   fill: purple;
+}
+
+.color9 {
+   fill: gold;
 }
 
 .graphparams-graphview-edge {

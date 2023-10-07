@@ -1,4 +1,4 @@
-module Main where
+module GraphParams.Main where
 
 import Relude hiding (view)
 
