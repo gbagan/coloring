@@ -46,7 +46,7 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
                 S.rect [SA.x 0, SA.y $ i * 10, SA.width 10, SA.height 10, H.class_ $ "color" <> show i]
           ]
       ]
-    , H.div [ H.class_ "flex flex-col graphparams-help-container" ]
+    , H.div [ H.class_ "flex flex-col" ]
         [ H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Graphe"]
         , H.select [H.class_ UI.selectClass, P.value "1",  E.onValueChange SetGraph]
             [ H.option [P.value "1"] [H.text "Graphe 1"]

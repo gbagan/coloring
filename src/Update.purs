@@ -154,7 +154,7 @@ update ImportAndClose = modify_ \model →
         Right json →
           case decodeJson json of
             Left _ -> model { dialog = NoDialog}
-            Right graph -> (model # _selectedGraph .~ graph) { dialog = NoDialog }
+            Right graph -> cleanResults $ (model # _selectedGraph .~ graph) { dialog = NoDialog }
     _ -> model
 
 update Export = modify_ \model → model { dialog = ExportDialog $ stringify (encodeJson (selectedGraph model))}
