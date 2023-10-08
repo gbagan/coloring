@@ -18,7 +18,7 @@ import Web.Event.Event (stopPropagation)
 import Web.PointerEvent.PointerEvent as PE
 import Web.UIEvent.MouseEvent as ME
 
-cleanResults :: Model -> Model
+cleanResults ∷ Model -> Model
 cleanResults = _ { results = [], selectedResultIndex = 0, currentStep = 0 }
 
 update ∷ Msg → Update Model Msg Aff Unit
@@ -73,7 +73,7 @@ update (DeleteVertex i ev) = do
         # _selectedGraph %~ Graph.removeVertex i
         # cleanResults
     else
-      model 
+      model
 
 update (DeleteEdge (Edge u v)) =
   modify_ \model →
@@ -110,12 +110,12 @@ update (SetAlgo name) =
   modify_ \model →
     model { selectedAlgorithm = 
       case name of
-        "alpha" -> Alphabetical
-        "decdegree" -> DecreasingDegree
-        "welsh" -> WelshPowell
-        "dsatur" -> DSatur
-        "custom" -> CustomAlgorithm (0 .. (nbVertices model - 1))
-        _ -> Alphabetical
+        "alpha" → Alphabetical
+        "decdegree" → DecreasingDegree
+        "welsh" → WelshPowell
+        "dsatur" → DSatur
+        "custom" → CustomAlgorithm (0 .. (nbVertices model - 1))
+        _ → Alphabetical
     }
 
 update (CustomAlgoTextChange text) =
@@ -128,38 +128,38 @@ update (SetResultIndex idx) = modify_ _ {selectedResultIndex = idx, currentStep 
 
 update Save = do
   model ← get
-  storagePut "coloring-graphs" $ stringify (encodeJson model.graphs)
+  storagePut "coloring-graph" $ stringify (encodeJson model.graphs)
 
 update Load = do
   mtext <- storageGet "coloring-graphs"
   case mtext of
-    Nothing -> pure unit
-    Just text ->
+    Nothing → pure unit
+    Just text →
       case jsonParser text of
         Left _ → pure unit
         Right json →
           case decodeJson json of
-            Left _ -> pure unit
-            Right graphs -> modify_ _ { graphs = graphs }
+            Left _ → pure unit
+            Right graphs → modify_ _ { graphs = graphs }
 
-update OpenImportDialog = modify_ \model → model { dialog = ImportDialog ""}
+update OpenImportDialog = modify_ \model → model { dialog = ImportDialog "" }
 
-update (ChangeImportText text) = modify_ \model → model { dialog = ImportDialog text}
+update (ChangeImportText text) = modify_ \model → model { dialog = ImportDialog text }
 
 update ImportAndClose = modify_ \model →
   case model.dialog of
     ImportDialog text →
       case jsonParser text of
-        Left _ → model { dialog = NoDialog}
+        Left _ → model { dialog = NoDialog }
         Right json →
           case decodeJson json of
-            Left _ -> model { dialog = NoDialog}
-            Right graph -> cleanResults $ (model # _selectedGraph .~ graph) { dialog = NoDialog }
+            Left _ → model { dialog = NoDialog }
+            Right graph → cleanResults $ (model # _selectedGraph .~ graph) { dialog = NoDialog }
     _ -> model
 
 update Export = modify_ \model → model { dialog = ExportDialog $ stringify (encodeJson (selectedGraph model))}
 
-update CloseDialog = modify_ _ { dialog = NoDialog}
+update CloseDialog = modify_ _ { dialog = NoDialog }
 
 update Compute =
   modify_ \model@{ selectedAlgorithm, results } →
@@ -170,10 +170,10 @@ update Compute =
     model { results = take 5 $ cons { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) } results }
 
 update PreviousStep =
-  modify_ \model -> model { currentStep = max 0 (model.currentStep-1) }
+  modify_ \model → model { currentStep = max 0 (model.currentStep-1) }
 
 update NextStep =
-  modify_ \model -> model { currentStep = min (nbVertices model) (model.currentStep+1) }
+  modify_ \model → model { currentStep = min (nbVertices model) (model.currentStep+1) }
 
 update FinishColoring =
-  modify_ \model -> model { currentStep = nbVertices model }
+  modify_ \model → model { currentStep = nbVertices model }

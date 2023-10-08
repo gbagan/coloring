@@ -7,17 +7,17 @@ import Pha.Html (Html, Prop)
 import Pha.Html as H
 import Pha.Html.Events as E
 
-baseButtonClass :: String
+baseButtonClass ∷ String
 baseButtonClass = "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
 
-buttonClass :: String
+buttonClass ∷ String
 buttonClass = baseButtonClass <> " rounded"
 
-button :: ∀msg. {name :: String, onClick :: msg, attrs :: Array (Prop msg)} → Html msg
+button ∷ ∀msg. {name ∷ String, onClick ∷ msg, attrs ∷ Array (Prop msg)} → Html msg
 button {name, onClick, attrs} =
   H.button ([ H.class_ $ buttonClass, E.onClick \_ → onClick ] <> attrs) [ H.text name ]
 
-buttonGroup ∷ ∀msg. Array {name :: String, onClick :: msg, attrs :: Array (Prop msg)} → Html msg
+buttonGroup ∷ ∀msg. Array {name ∷ String, onClick ∷ msg, attrs ∷ Array (Prop msg)} → Html msg
 buttonGroup buttons =
   H.div [] $
     buttons # mapWithIndex \i {name, onClick, attrs} →
@@ -46,13 +46,13 @@ textareaClass = "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg 
 checkboxClass ∷ String
 checkboxClass = "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
 
-textInputClass :: String
+textInputClass ∷ String
 textInputClass = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
 
 selectClass ∷ String
 selectClass = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
 
-dialog ∷ ∀msg. String → Array (Html msg) → Array { name :: String, onClick :: msg } → Html msg
+dialog ∷ ∀msg. String → Array (Html msg) → Array { name ∷ String, onClick ∷ msg } → Html msg
 dialog title body buttons =
   H.div [ H.class_ "absolute w-full h-full flex items-center justify-center bg-transp-grey inset-0 z-50" ]
     [ H.div [ H.class_ "bg-white text-black rounded block border-2" ]

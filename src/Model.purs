@@ -25,17 +25,17 @@ data Dialog
   | ExportDialog String
   | ImportDialog String
 
-labelToString :: Int -> String
+labelToString ∷ Int -> String
 labelToString = singleton <<< fromMaybe 'A' <<< \n -> fromCharCode (n + toCharCode 'A')
 
-orderingToString :: Array Int -> String
+orderingToString ∷ Array Int -> String
 orderingToString = fromCharArray <<< catMaybes <<< map \n -> fromCharCode (n + toCharCode 'A')
 
-stringToOrdering :: String -> Maybe (Array Int)
+stringToOrdering ∷ String -> Maybe (Array Int)
 stringToOrdering text = Just $ text # toCharArray # map (\c -> toCharCode c - toCharCode 'A')
 -- todo
 
-algoToString :: Algorithm -> String
+algoToString ∷ Algorithm -> String
 algoToString Alphabetical = "Alphabétique"
 algoToString DecreasingDegree = "Degré décroissant"
 algoToString WelshPowell = "Welsh and Powell"
@@ -75,18 +75,18 @@ selectedGraph ∷ Model -> Graph
 selectedGraph {graphs, selectedGraphIdx} =
   fromMaybe {layout: [], edges: []} $ graphs !! selectedGraphIdx
 
-_graphs :: Lens' Model (Array Graph)
-_graphs = prop (Proxy :: _"graphs")
+_graphs ∷ Lens' Model (Array Graph)
+_graphs = prop (Proxy ∷ _"graphs")
 
 
-_selectedGraph :: AffineTraversal' Model Graph
+_selectedGraph ∷ AffineTraversal' Model Graph
 _selectedGraph = affineTraversal set pre
   where
-  set :: Model -> Graph -> Model
+  set ∷ Model -> Graph -> Model
   set model@{graphs, selectedGraphIdx} b =
     model { graphs = fromMaybe graphs $ updateAt selectedGraphIdx b graphs }
 
-  pre :: Model -> Either Model Graph
+  pre ∷ Model -> Either Model Graph
   pre model = maybe (Left model) Right $ model.graphs !! model.selectedGraphIdx
 
 nbVertices ∷ Model -> Int
