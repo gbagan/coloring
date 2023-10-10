@@ -61,10 +61,10 @@ dialog title body buttons =
             ]
         , H.div [ H.class_ "p-6 border-b-2" ] body
         , H.div [ H.class_ "p-4 text-right" ] $ 
-            buttons # mapWithIndex \i {name, onClick} ->
+            buttons # mapWithIndex \i {name, onClick} →
               H.button
                 [ H.class_ $ buttonClass <> (if i == 0 then "" else " ml-4")
-                , E.onClick \_ -> onClick
+                , E.onClick \_ → onClick
                 ] [ H.text name ]
         ]
     ]

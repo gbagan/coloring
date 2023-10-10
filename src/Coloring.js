@@ -46,7 +46,7 @@ export const dsatur = graph => {
     return result
 }
 
-export const welshPowellImpl = graph => order => {
+export const indSetColoringImpl = graph => order => {
     const result = []
     let color = 0
     const colored = new Array(graph.length)

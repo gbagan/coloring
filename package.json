@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "esbuild": "^0.19.4",
-    "purescript": "^0.15.11",
+    "purescript": "^0.15.12",
     "purs-backend-es": "^1.4.2",
     "rimraf": "^5.0.5",
     "sass": "^1.69.0",

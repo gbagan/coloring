@@ -3,7 +3,7 @@ module GraphParams.View (view) where
 import Relude
 
 import GraphParams.GraphView (graphView)
-import GraphParams.Model (Model, Algorithm(..), Dialog(..), algoToString, orderingToString)
+import GraphParams.Model (Model, Algorithm(..), Dialog(..), algoToString, orderingToString, partialOrdering)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (repeat)
 import GraphParams.UI as UI
@@ -42,7 +42,7 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
     , UI.card "Ordre des couleurs"
       [ H.div [H.class_ "w-16"]
           [ S.svg [SA.viewBox 0.0 0.0 10.0 100.0] $
-              (0..9) <#> \i ->
+              (0..9) <#> \i →
                 S.rect [SA.x 0, SA.y $ i * 10, SA.width 10, SA.height 10, H.class_ $ "color" <> show i]
           ]
       ]
@@ -63,37 +63,39 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
         , H.select [H.class_ UI.selectClass, P.name "dsatur", E.onValueChange SetAlgo]
             [ H.option [P.value "alpha"] [H.text "Alphabetique"]
             , H.option [P.value "decdegree"] [H.text "Degré décroissant"]
-            , H.option [P.value "welsh"] [H.text "Welsh and Powell"]
+            , H.option [P.value "indset"] [H.text "Stables"]
             , H.option [P.value "dsatur"] [H.text "DSatur"]
             , H.option [P.value "custom"] [H.text "Personnalisé"]
             ]
         , case selectedAlgorithm of
-            CustomAlgorithm ord -> 
+            CustomAlgorithm ord → 
               H.input 
                 [ H.class_ UI.textInputClass
                 , P.type_ "text"
                 , P.value $ orderingToString ord
                 , E.onValueChange CustomAlgoTextChange
                 ]
-            _ -> H.empty
+            _ → H.empty
         , UI.button {onClick: Compute, name: "Calculer", attrs: [] }
         , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Résultats"]
         , H.ul [H.class_ "ml-4 list-disc"] $
-            (results # mapWithIndex \idx {algorithm, number} ->
+            (results # mapWithIndex \idx {algorithm, number} →
               H.li
                 [ H.class' "text-blue-600" $ selectedResultIndex == idx
-                , E.onClick \_ -> SetResultIndex idx
+                , E.onClick \_ → SetResultIndex idx
                 ]
                 [ H.text $ algoToString algorithm <> " (" <> show number <> " couleurs)" ]
-            ) <> (repeat (5 - length results) \_ -> H.li [] [])
+            ) <> (repeat (5 - length results) \_ → H.li [] [])
         , UI.buttonGroup 
             [ {onClick: PreviousStep, name: "Etape précédente", attrs: [] }
             , {onClick: NextStep, name: "Etape suivante", attrs: [] }
             , {onClick: FinishColoring, name: "Termine la coloration", attrs: [] }
             ]
+        , H.span [H.class_ "text-xl"]
+            [ H.text $ orderingToString (partialOrdering model) ]
         ]
     , case dialog of
-        NoDialog -> H.empty
-        ExportDialog text -> exportDialog text
-        ImportDialog text -> importDialog text
+        NoDialog → H.empty
+        ExportDialog text → exportDialog text
+        ImportDialog text → importDialog text
     ]

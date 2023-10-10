@@ -60,7 +60,7 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
                       S.circle
                         [ SA.cx $ 100.0 * x
                         , SA.cy $ 100.0 * y
-                        , SA.r 4
+                        , SA.r $ if n <= 26 then 4 else 2
                         , SA.strokeWidth 0.5
                         , H.class_ $ "graphparams-graphview-vertex color" <> show color
                         , H.class' "deletemode" $ editmode == DeleteMode
@@ -68,9 +68,9 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
                         , E.onPointerDown (SelectVertex i)
                         , E.onPointerUp \_ → PointerUp i
                         ]
-              , H.when (n <= 26) \_ ->
+              , H.when (n <= 26) \_ →
                   S.g [] $
-                    layout # mapWithIndex \idx {x, y} ->
+                    layout # mapWithIndex \idx {x, y} →
                         S.text 
                           [ H.class_ "pointer-events-none graphview-text"
                           , SA.x (100.0 * x - 2.0)

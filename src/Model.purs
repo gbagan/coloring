@@ -5,7 +5,7 @@ import Relude
 import Data.Lens.AffineTraversal (AffineTraversal', affineTraversal)
 import Data.Char (fromCharCode, toCharCode)
 import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
-import GraphParams.Coloring (Coloring, alphabeticalColoring, customColoring, decreasingDegreeColoring, welshPowell, dsatur)
+import GraphParams.Coloring (Coloring, alphabeticalColoring, customColoring, decreasingDegreeColoring, indSetColoring, dsatur)
 import GraphParams.Graph (Graph, toAdjGraph)
 
 data EditMode = MoveMode | VertexMode | AddEMode | DeleteMode
@@ -16,7 +16,7 @@ type Position = { x ∷ Number, y ∷ Number}
 data Algorithm 
   = Alphabetical
   | DecreasingDegree
-  | WelshPowell
+  | IndependentSet
   | DSatur
   | CustomAlgorithm (Array Int)
 
@@ -25,20 +25,20 @@ data Dialog
   | ExportDialog String
   | ImportDialog String
 
-labelToString ∷ Int -> String
-labelToString = singleton <<< fromMaybe 'A' <<< \n -> fromCharCode (n + toCharCode 'A')
+labelToString ∷ Int → String
+labelToString = singleton <<< fromMaybe 'A' <<< \n → fromCharCode (n + toCharCode 'A')
 
-orderingToString ∷ Array Int -> String
-orderingToString = fromCharArray <<< catMaybes <<< map \n -> fromCharCode (n + toCharCode 'A')
+orderingToString ∷ Array Int → String
+orderingToString = fromCharArray <<< catMaybes <<< map \n → fromCharCode (n + toCharCode 'A')
 
-stringToOrdering ∷ String -> Maybe (Array Int)
-stringToOrdering text = Just $ text # toCharArray # map (\c -> toCharCode c - toCharCode 'A')
+stringToOrdering ∷ String → Maybe (Array Int)
+stringToOrdering text = Just $ text # toCharArray # map (\c → toCharCode c - toCharCode 'A')
 -- todo
 
-algoToString ∷ Algorithm -> String
+algoToString ∷ Algorithm → String
 algoToString Alphabetical = "Alphabétique"
 algoToString DecreasingDegree = "Degré décroissant"
-algoToString WelshPowell = "Welsh and Powell"
+algoToString IndependentSet = "Stables"
 algoToString DSatur = "DSatur"
 algoToString (CustomAlgorithm ord) = orderingToString ord
 
@@ -71,7 +71,7 @@ init =
   , dialog: NoDialog
   }
 
-selectedGraph ∷ Model -> Graph
+selectedGraph ∷ Model → Graph
 selectedGraph {graphs, selectedGraphIdx} =
   fromMaybe {layout: [], edges: []} $ graphs !! selectedGraphIdx
 
@@ -82,17 +82,30 @@ _graphs = prop (Proxy ∷ _"graphs")
 _selectedGraph ∷ AffineTraversal' Model Graph
 _selectedGraph = affineTraversal set pre
   where
-  set ∷ Model -> Graph -> Model
+  set ∷ Model → Graph → Model
   set model@{graphs, selectedGraphIdx} b =
     model { graphs = fromMaybe graphs $ updateAt selectedGraphIdx b graphs }
 
-  pre ∷ Model -> Either Model Graph
+  pre ∷ Model → Either Model Graph
   pre model = maybe (Left model) Right $ model.graphs !! model.selectedGraphIdx
 
-nbVertices ∷ Model -> Int
+nbVertices ∷ Model → Int
 nbVertices model = length (selectedGraph model).layout
 
-partialColoring ∷ Model -> Array Int
+isAnOrdering ∷ Int → Array Int → Boolean
+isAnOrdering _ [] = true
+isAnOrdering n ord = sort ord == 0 .. (n - 1)
+
+partialOrdering ∷ Model → Array Int
+partialOrdering model@{currentStep, results, selectedResultIndex} =
+  let
+    graph = selectedGraph model
+  in
+  fromMaybe [] do
+    {coloring} <- results !! selectedResultIndex
+    pure $ take currentStep (map _.vertex coloring)
+
+partialColoring ∷ Model → Array Int
 partialColoring model@{currentStep, results, selectedResultIndex} =
   let
     graph = selectedGraph model
@@ -100,15 +113,19 @@ partialColoring model@{currentStep, results, selectedResultIndex} =
   in
   fromMaybe emptyColoring do
     {coloring} <- results !! selectedResultIndex
-    let pcoloring = take currentStep coloring # map \{vertex, color} -> vertex /\ color
+    let pcoloring = take currentStep coloring # map \{vertex, color} → vertex /\ color
     pure $ updateAtIndices pcoloring emptyColoring
 
-runColoring ∷ Graph -> Algorithm -> Coloring
+runColoring ∷ Graph → Algorithm → Maybe Coloring
 runColoring graph algo =
   let adjGraph = toAdjGraph graph in
   case algo of
-    Alphabetical -> alphabeticalColoring adjGraph
-    DecreasingDegree -> decreasingDegreeColoring adjGraph
-    DSatur -> dsatur adjGraph
-    WelshPowell -> welshPowell adjGraph
-    CustomAlgorithm ordering -> customColoring adjGraph ordering
+    Alphabetical → Just $ alphabeticalColoring adjGraph
+    DecreasingDegree → Just $ decreasingDegreeColoring adjGraph
+    DSatur → Just $ dsatur adjGraph
+    IndependentSet → Just $ indSetColoring adjGraph
+    CustomAlgorithm ordering → 
+      if isAnOrdering (length adjGraph) ordering then
+        Just $ customColoring adjGraph ordering
+      else
+        Nothing

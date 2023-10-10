@@ -18,7 +18,7 @@ import Web.Event.Event (stopPropagation)
 import Web.PointerEvent.PointerEvent as PE
 import Web.UIEvent.MouseEvent as ME
 
-cleanResults ∷ Model -> Model
+cleanResults ∷ Model → Model
 cleanResults = _ { results = [], selectedResultIndex = 0, currentStep = 0 }
 
 update ∷ Msg → Update Model Msg Aff Unit
@@ -84,45 +84,47 @@ update (DeleteEdge (Edge u v)) =
     else
       model
 
-update ClearGraph = modify_ \model -> model 
+update ClearGraph = modify_ \model → model 
                                         # _selectedGraph .~ { layout: [], edges: [] }
                                         # cleanResults
-update GenBigGraph = modify_ \model -> model 
+update GenBigGraph = modify_ \model → model 
                                         # _selectedGraph .~ Graph.bigGraph
                                         # cleanResults
 update (SetEditMode mode) = modify_ _ { editmode = mode }
 
-update AdjustGraph = modify_ \model → model # _selectedGraph %~ \graph ->
+update AdjustGraph = modify_ \model → model # _selectedGraph %~ \graph →
                       graph { layout = computeLayout (length $ graph.layout) graph.edges }
 
 update (SetGraph str) =
   modify_ \model →
     model { selectedGraphIdx =
       case str of
-        "1" -> 0
-        "2" -> 1
-        "3" -> 2
-        "4" -> 3
-        _ -> 0
+        "1" → 0
+        "2" → 1
+        "3" → 2
+        "4" → 3
+        _ → 0
     } # cleanResults 
 
 update (SetAlgo name) =
   modify_ \model →
-    model { selectedAlgorithm = 
-      case name of
-        "alpha" → Alphabetical
-        "decdegree" → DecreasingDegree
-        "welsh" → WelshPowell
-        "dsatur" → DSatur
-        "custom" → CustomAlgorithm (0 .. (nbVertices model - 1))
-        _ → Alphabetical
-    }
+    model
+      { currentStep = 0
+      , selectedAlgorithm = 
+          case name of
+          "alpha" → Alphabetical
+          "decdegree" → DecreasingDegree
+          "indset" → IndependentSet
+          "dsatur" → DSatur
+          "custom" → CustomAlgorithm (0 .. (nbVertices model - 1))
+          _ → Alphabetical
+      }
 
 update (CustomAlgoTextChange text) =
   modify_ \model →
     case stringToOrdering text of
       Nothing → model
-      Just ord -> model { selectedAlgorithm = CustomAlgorithm ord }
+      Just ord → model { selectedAlgorithm = CustomAlgorithm ord }
     
 update (SetResultIndex idx) = modify_ _ {selectedResultIndex = idx, currentStep = 0}
 
@@ -155,7 +157,7 @@ update ImportAndClose = modify_ \model →
           case decodeJson json of
             Left _ → model { dialog = NoDialog }
             Right graph → cleanResults $ (model # _selectedGraph .~ graph) { dialog = NoDialog }
-    _ -> model
+    _ → model
 
 update Export = modify_ \model → model { dialog = ExportDialog $ stringify (encodeJson (selectedGraph model))}
 
@@ -165,9 +167,14 @@ update Compute =
   modify_ \model@{ selectedAlgorithm, results } →
     let
       graph = selectedGraph model
-      coloring = runColoring graph selectedAlgorithm
     in
-    model { results = take 5 $ cons { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) } results }
+      case runColoring graph selectedAlgorithm of
+        Nothing → model
+        Just coloring → 
+          let
+            algorithm = { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) }
+          in
+            model { results = take 5 $ cons algorithm results }  
 
 update PreviousStep =
   modify_ \model → model { currentStep = max 0 (model.currentStep-1) }
