@@ -53,6 +53,10 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
             , H.option [P.value "2"] [H.text "Graphe 2"]
             , H.option [P.value "3"] [H.text "Graphe 3"]
             , H.option [P.value "4"] [H.text "Graphe 4"]
+            , H.option [P.value "5"] [H.text "Gros graphe"]
+            , H.option [P.value "6"] [H.text "Graphe personnalisé 1"]
+            , H.option [P.value "7"] [H.text "Graphe personnalisé 2"]
+            , H.option [P.value "8"] [H.text "Graphe personnalisé 3"]
             ]
         , UI.buttonGroup
             [ {onClick: Save, name: "Sauvegarder", attrs: [] }
@@ -76,15 +80,19 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
                 , E.onValueChange CustomAlgoTextChange
                 ]
             _ → H.empty
-        , UI.button {onClick: Compute, name: "Calculer", attrs: [] }
+        , UI.button {onClick: Compute, name: "Choisir", attrs: [] }
         , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Résultats"]
         , H.ul [H.class_ "ml-4 list-disc"] $
-            (results # mapWithIndex \idx {algorithm, number} →
+            (results # mapWithIndex \idx {algorithm, number, showNumber} →
               H.li
                 [ H.class' "text-blue-600" $ selectedResultIndex == idx
                 , E.onClick \_ → SetResultIndex idx
                 ]
-                [ H.text $ algoToString algorithm <> " (" <> show number <> " couleurs)" ]
+                [ H.text $ algoToString algorithm <>
+                    if not showNumber then
+                      ""
+                    else
+                      " (" <> show number <> " couleurs)" ]
             ) <> (repeat (5 - length results) \_ → H.li [] [])
         , UI.buttonGroup 
             [ {onClick: PreviousStep, name: "Etape précédente", attrs: [] }

@@ -6,7 +6,7 @@ import Data.Lens.AffineTraversal (AffineTraversal', affineTraversal)
 import Data.Char (fromCharCode, toCharCode)
 import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
 import GraphParams.Coloring (Coloring, alphabeticalColoring, customColoring, decreasingDegreeColoring, indSetColoring, dsatur)
-import GraphParams.Graph (Graph, toAdjGraph)
+import GraphParams.Graph (Graph, toAdjGraph, initialGraphs)
 
 data EditMode = MoveMode | VertexMode | AddEMode | DeleteMode
 derive instance Eq EditMode
@@ -42,7 +42,12 @@ algoToString IndependentSet = "Stables"
 algoToString DSatur = "DSatur"
 algoToString (CustomAlgorithm ord) = orderingToString ord
 
-type Result = { algorithm ∷ Algorithm, coloring ∷ Coloring, number ∷ Int }
+type Result =
+  { algorithm ∷ Algorithm
+  , coloring ∷ Coloring
+  , number ∷ Int
+  , showNumber ∷ Boolean
+  }
 
 type Model =
   { selectedAlgorithm ∷ Algorithm
@@ -63,7 +68,7 @@ init =
   , results: []
   , currentStep: 0
   , selectedResultIndex: 0
-  , graphs: replicate 4 {layout: [], edges: []}
+  , graphs: initialGraphs
   , selectedGraphIdx: 0
   , editmode: MoveMode
   , selectedVertex: Nothing
@@ -88,6 +93,9 @@ _selectedGraph = affineTraversal set pre
 
   pre ∷ Model → Either Model Graph
   pre model = maybe (Left model) Right $ model.graphs !! model.selectedGraphIdx
+
+_results ∷ Lens' Model (Array Result)
+_results = prop (Proxy ∷ _"results")
 
 nbVertices ∷ Model → Int
 nbVertices model = length (selectedGraph model).layout

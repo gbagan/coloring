@@ -72,7 +72,7 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
                   S.g [] $
                     layout # mapWithIndex \idx {x, y} →
                         S.text 
-                          [ H.class_ "pointer-events-none graphview-text"
+                          [ H.class_ "pointer-events-none select-none graphview-text"
                           , SA.x (100.0 * x - 2.0)
                           , SA.y (100.0 * y + 2.0)
                           ]

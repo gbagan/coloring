@@ -8,6 +8,7 @@
   , "pha"
   , "profunctor-lenses"
   , "relude"
+  , "st"
   , "strings"
   , "web-dom"
   , "web-events"

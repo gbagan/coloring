@@ -6,10 +6,11 @@ import Data.Argonaut.Core (stringify)
 import Data.Argonaut.Decode (decodeJson)
 import Data.Argonaut.Encode (encodeJson)
 import Data.Argonaut.Parser (jsonParser)
+import Data.Array (drop)
 import GraphParams.Graph (Edge(..))
 import GraphParams.Graph as Graph
 import GraphParams.Layout (computeLayout)
-import GraphParams.Model (Algorithm(..), Dialog(..), EditMode(..), Model, _selectedGraph
+import GraphParams.Model (Algorithm(..), Dialog(..), EditMode(..), Model, _graphs, _selectedGraph, _results
                         , selectedGraph, nbVertices, runColoring, stringToOrdering)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (pointerDecoder, storageGet, storagePut)
@@ -20,6 +21,13 @@ import Web.UIEvent.MouseEvent as ME
 
 cleanResults ∷ Model → Model
 cleanResults = _ { results = [], selectedResultIndex = 0, currentStep = 0 }
+
+showColorNumber ∷ Model → Model
+showColorNumber model =
+  if model.currentStep /= nbVertices model then
+    model
+  else
+    model # _results <<< ix model.selectedResultIndex %~ _ { showNumber = true }
 
 update ∷ Msg → Update Model Msg Aff Unit
 update (AddVertex ev) = do
@@ -46,7 +54,6 @@ update (GraphMove ev) = do
   modify_ \model → case pos, model.editmode, model.selectedVertex of
     Just p, MoveMode, Just i → model 
                                 # _selectedGraph %~ Graph.moveVertex i p
-                                # cleanResults
     Just p, AddEMode, _ → model { currentPosition = Just p }
     _, _, _ → model
 
@@ -103,6 +110,10 @@ update (SetGraph str) =
         "2" → 1
         "3" → 2
         "4" → 3
+        "5" → 4
+        "6" → 5
+        "7" → 6
+        "8" → 7
         _ → 0
     } # cleanResults 
 
@@ -130,7 +141,7 @@ update (SetResultIndex idx) = modify_ _ {selectedResultIndex = idx, currentStep 
 
 update Save = do
   model ← get
-  storagePut "coloring-graph" $ stringify (encodeJson model.graphs)
+  storagePut "coloring-graphs" $ stringify (encodeJson (drop 5 model.graphs))
 
 update Load = do
   mtext <- storageGet "coloring-graphs"
@@ -142,7 +153,10 @@ update Load = do
         Right json →
           case decodeJson json of
             Left _ → pure unit
-            Right graphs → modify_ _ { graphs = graphs }
+            Right graphs →
+              if length graphs /= 3
+              then pure unit
+              else _graphs %= \gs → take 5 gs <> graphs
 
 update OpenImportDialog = modify_ \model → model { dialog = ImportDialog "" }
 
@@ -172,7 +186,12 @@ update Compute =
         Nothing → model
         Just coloring → 
           let
-            algorithm = { algorithm: selectedAlgorithm, coloring, number: 1 + fromMaybe 0 (maximum (coloring # map _.color)) }
+            algorithm =
+              { algorithm: selectedAlgorithm
+              , coloring
+              , number: 1 + fromMaybe (-1) (maximum (coloring # map _.color))
+              , showNumber: false
+              }
           in
             model { results = take 5 $ cons algorithm results }  
 
@@ -180,7 +199,7 @@ update PreviousStep =
   modify_ \model → model { currentStep = max 0 (model.currentStep-1) }
 
 update NextStep =
-  modify_ \model → model { currentStep = min (nbVertices model) (model.currentStep+1) }
+  modify_ \model → showColorNumber $ model { currentStep = min (nbVertices model) (model.currentStep+1) }
 
 update FinishColoring =
-  modify_ \model → model { currentStep = nbVertices model }
+  modify_ \model → showColorNumber $ model { currentStep = nbVertices model }

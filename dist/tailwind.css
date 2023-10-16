@@ -586,6 +586,12 @@ video {
   width: 100%;
 }
 
+.select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
 .list-disc {
   list-style-type: disc;
 }
