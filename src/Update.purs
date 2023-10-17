@@ -94,9 +94,7 @@ update (DeleteEdge (Edge u v)) =
 update ClearGraph = modify_ \model → model 
                                         # _selectedGraph .~ { layout: [], edges: [] }
                                         # cleanResults
-update GenBigGraph = modify_ \model → model 
-                                        # _selectedGraph .~ Graph.bigGraph
-                                        # cleanResults
+
 update (SetEditMode mode) = modify_ _ { editmode = mode }
 
 update AdjustGraph = modify_ \model → model # _selectedGraph %~ \graph →

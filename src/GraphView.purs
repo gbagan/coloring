@@ -90,6 +90,5 @@ graphView model@{ editmode, currentPosition, selectedVertex } =
           , { name: "Retirer", onClick: SetEditMode DeleteMode, attrs: [ P.selected $ editmode == DeleteMode] }
           , { name: "Tout effacer", onClick: ClearGraph, attrs: [ ] }
           , { name: "Ajuster", onClick: AdjustGraph, attrs: [ ] }
-          , { name: "Gros graphe", onClick: GenBigGraph, attrs: [ ] }
           ]
       ]
