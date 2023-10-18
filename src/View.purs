@@ -3,7 +3,7 @@ module GraphParams.View (view) where
 import Relude
 
 import GraphParams.GraphView (graphView)
-import GraphParams.Model (Model, Algorithm(..), Dialog(..), algoToString, orderingToString, partialOrdering)
+import GraphParams.Model (Model, Algorithm(..), Dialog(..), algoToString, orderingToString, nbVertices, partialOrdering)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (repeat)
 import GraphParams.UI as UI
@@ -40,10 +40,12 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
   H.div [ H.class_ "flex flex-row justify-around" ]
     [ UI.card "Graphe" [graphView model]
     , UI.card "Ordre des couleurs"
-      [ H.div [H.class_ "w-16"]
-          [ S.svg [SA.viewBox 0.0 0.0 10.0 100.0] $
-              (0..9) <#> \i →
-                S.rect [SA.x 0, SA.y $ i * 10, SA.width 10, SA.height 10, H.class_ $ "color" <> show i]
+      [ H.div [H.class_ "w-32"]
+          [ S.svg [SA.viewBox 0.0 0.0 20.0 100.0] $
+              (0..9) >>= \i →
+                [ S.rect [SA.x 0, SA.y $ i * 10 , SA.width 10, SA.height 10, H.class_ $ "color" <> show i]
+                , S.text [SA.x 12, SA.y $ i * 10 + 8, H.class_ "graphview-text"] [H.text $ show (i + 1)]
+                ]
           ]
       ]
     , H.div [ H.class_ "flex flex-col" ]
@@ -63,7 +65,7 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
             , {onClick: OpenImportDialog, name: "Importer", attrs: [] }
             , {onClick: Export, name: "Exporter", attrs: [] }
             ]
-        , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Algorithme"]
+        , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Ordre"]
         , H.select [H.class_ UI.selectClass, P.name "dsatur", E.onValueChange SetAlgo]
             [ H.option [P.value "alpha"] [H.text "Alphabetique"]
             , H.option [P.value "decdegree"] [H.text "Degré décroissant"]
@@ -73,12 +75,13 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
             ]
         , case selectedAlgorithm of
             CustomAlgorithm ord → 
-              H.input 
-                [ H.class_ UI.textInputClass
-                , P.type_ "text"
-                , P.value $ orderingToString ord
-                , E.onValueChange CustomAlgoTextChange
-                ]
+              H.when (nbVertices model <= 26) \_ →
+                H.input 
+                  [ H.class_ UI.textInputClass
+                  , P.type_ "text"
+                  , P.value $ orderingToString ord
+                  , E.onValueChange CustomAlgoTextChange
+                  ]
             _ → H.empty
         , UI.button {onClick: Compute, name: "Choisir", attrs: [] }
         , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Résultats"]
@@ -99,8 +102,9 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
             , {onClick: NextStep, name: "Etape suivante", attrs: [] }
             , {onClick: FinishColoring, name: "Termine la coloration", attrs: [] }
             ]
-        , H.span [H.class_ "text-xl"]
-            [ H.text $ orderingToString (partialOrdering model) ]
+        , H.when (nbVertices model <= 26) \_ →
+            H.span [H.class_ "text-xl"]
+              [ H.text $ orderingToString (partialOrdering model) ]
         ]
     , case dialog of
         NoDialog → H.empty

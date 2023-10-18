@@ -105,10 +105,7 @@ isAnOrdering _ [] = true
 isAnOrdering n ord = sort ord == 0 .. (n - 1)
 
 partialOrdering ∷ Model → Array Int
-partialOrdering model@{currentStep, results, selectedResultIndex} =
-  let
-    graph = selectedGraph model
-  in
+partialOrdering {currentStep, results, selectedResultIndex} =
   fromMaybe [] do
     {coloring} <- results !! selectedResultIndex
     pure $ take currentStep (map _.vertex coloring)
@@ -137,3 +134,10 @@ runColoring graph algo =
         Just $ customColoring adjGraph ordering
       else
         Nothing
+
+runBiasedColoring ∷ Int → Graph → Algorithm → Maybe Coloring
+runBiasedColoring idx graph algo =
+  case idx, algo of
+    1, DecreasingDegree → Just $ customColoring (toAdjGraph graph) [11, 10, 1, 9, 8, 6, 3, 0, 7, 5, 2, 4]
+    1, IndependentSet → Just $ customColoring (toAdjGraph graph) [11, 10, 7, 4, 1, 6, 8, 2, 9, 5, 3, 0]
+    _, _ → runColoring graph algo

@@ -11,7 +11,7 @@ import GraphParams.Graph (Edge(..))
 import GraphParams.Graph as Graph
 import GraphParams.Layout (computeLayout)
 import GraphParams.Model (Algorithm(..), Dialog(..), EditMode(..), Model, _graphs, _selectedGraph, _results
-                        , selectedGraph, nbVertices, runColoring, stringToOrdering)
+                        , selectedGraph, nbVertices, runBiasedColoring, stringToOrdering)
 import GraphParams.Msg (Msg(..))
 import GraphParams.Util (pointerDecoder, storageGet, storagePut)
 import Pha.Update (Update)
@@ -176,11 +176,11 @@ update Export = modify_ \model → model { dialog = ExportDialog $ stringify (en
 update CloseDialog = modify_ _ { dialog = NoDialog }
 
 update Compute =
-  modify_ \model@{ selectedAlgorithm, results } →
+  modify_ \model@{ selectedAlgorithm, selectedGraphIdx, results } →
     let
       graph = selectedGraph model
     in
-      case runColoring graph selectedAlgorithm of
+      case runBiasedColoring selectedGraphIdx graph selectedAlgorithm of
         Nothing → model
         Just coloring → 
           let
