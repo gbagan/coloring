@@ -1,5 +1,3 @@
-# graphparams
-compute and visualize graph parameters
+# coloring
 
-
-https://gbagan.github.io/graphparams/
+https://gbagan.github.io/coloring/
