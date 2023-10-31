@@ -1,7 +1,6 @@
 module GraphParams.Graph where
 
 import Relude
-import Data.Array (modifyAtIndices)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import GraphParams.Util (repeat, pseudoRandom)
