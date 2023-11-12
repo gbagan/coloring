@@ -66,7 +66,7 @@ view model@{ dialog, selectedAlgorithm, results, selectedResultIndex } =
             , {onClick: Export, name: "Exporter", attrs: [] }
             ]
         , H.span [H.class_ "mb-2 mt-4 text-2xl font-bold"] [H.text "Ordre"]
-        , H.select [H.class_ UI.selectClass, P.name "dsatur", E.onValueChange SetAlgo]
+        , H.select [H.class_ UI.selectClass, E.onValueChange SetAlgo]
             [ H.option [P.value "alpha"] [H.text "Alphabetique"]
             , H.option [P.value "decdegree"] [H.text "Degré décroissant"]
             , H.option [P.value "indset"] [H.text "Stables"]
