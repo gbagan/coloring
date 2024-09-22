@@ -63,7 +63,7 @@ export function indSetColoring(graph: AdjGraph): Coloring {
   return result
 }
 
-function dsaturStep(graph: AdjGraph, colors: number[]): number | undefined {
+function dsaturStep(graph: AdjGraph, colors: number[]): number | null {
   const order =
     zip(range(0, graph.length), graph, colors) 
     .filter(([,,color]) => color === -1)
@@ -72,7 +72,7 @@ function dsaturStep(graph: AdjGraph, colors: number[]): number | undefined {
       saturation: uniq(nbor!.map(v => colors[v]).filter(c => c !== -1)).length,
       degree: nbor!.length,
     }));
-  return maxBy(order, o=>o.saturation*10000+o.degree)?.vertex
+  return maxBy(order, o=>o.saturation*10000+o.degree)?.vertex ?? null
 }
 
 export function dsatur(graph: AdjGraph): Coloring {
@@ -81,7 +81,7 @@ export function dsatur(graph: AdjGraph): Coloring {
   const result: Coloring = []; 
   while(true) {
     let v = dsaturStep(graph, colors);
-    if (v === undefined) {
+    if (v === null) {
         break;
     }
     const c = colorWithFirstAvailable(graph, colors, v);

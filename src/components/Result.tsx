@@ -13,7 +13,7 @@ function algoName(algo: Algo): string {
 
 type ResultComponent = Component<{
   idx: number,
-  result: Result | undefined
+  result: Result | null
   selected: boolean,
   onClick: () => void,
 }>

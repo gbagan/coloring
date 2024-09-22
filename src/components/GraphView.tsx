@@ -26,8 +26,8 @@ type GraphComponent = Component<{
 
 const GraphView: GraphComponent = props => {
   const [editMode, setEditMode] = createSignal("move" as EditMode);
-  const [pointerPosition, setPointerPosition] = createSignal(undefined as Position | undefined);
-  const [selectedVertex, setSelectedVertex] = createSignal(undefined as number | undefined);
+  const [pointerPosition, setPointerPosition] = createSignal(null as Position | null);
+  const [selectedVertex, setSelectedVertex] = createSignal(null as number | null);
 
   const selectedPosition = () => props.graph.layout[selectedVertex()!];
 
@@ -35,7 +35,7 @@ const GraphView: GraphComponent = props => {
     const pos = getPointerPosition(ev);
     const idx = selectedVertex();
     const mode = editMode();
-    if (mode === "move" && idx !== undefined) {
+    if (mode === "move" && idx !== null) {
       props.moveVertex(idx, pos);
     } else if (mode === "adde") {
       setPointerPosition(pos);
@@ -53,10 +53,10 @@ const GraphView: GraphComponent = props => {
     ev.stopPropagation();
     const mode = editMode();
     const idx2 = selectedVertex();
-    if (mode === "adde" && idx2 !== undefined && idx2 !== idx) {
+    if (mode === "adde" && idx2 !== null && idx2 !== idx) {
       props.addEdge(idx, idx2);
     }
-    setSelectedVertex(undefined);
+    setSelectedVertex(null);
   }
 
   return (
@@ -66,7 +66,7 @@ const GraphView: GraphComponent = props => {
           viewBox="0 0 100 100"
           class="block"
           onPointerMove={move}
-          onPointerUp={() => editMode() === "adde" && setSelectedVertex(undefined)}
+          onPointerUp={() => editMode() === "adde" && setSelectedVertex(null)}
           onClick={e => editMode() === "addv" && props.addVertex(getPointerPosition(e))}
         >
           <For each={props.graph.edges}>
@@ -105,7 +105,7 @@ const GraphView: GraphComponent = props => {
               )}
             </Index>
           </Show>
-          <Show when={editMode() == "adde" && selectedVertex() !== undefined && pointerPosition()}>
+          <Show when={editMode() == "adde" && selectedVertex() !== null && pointerPosition()}>
             <line
               x1={100 * selectedPosition().x}
               y1={100 * selectedPosition().y}

@@ -22,7 +22,7 @@ type ConfigComponent = Component<{
 const Config: ConfigComponent = props => {
   const partialOrdering = () => {
     const result = props.state.results[props.state.selectedResultIndex];
-    if (result === undefined)
+    if (!result)
       return "";
     return take(result.coloring.map(c => alphabet[c.vertex]), props.state.currentStep).join("");
   }

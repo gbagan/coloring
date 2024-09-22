@@ -51,7 +51,7 @@ const App: Component = () => {
 
   const setCustomOrdering = (text: string) => {
     const ordering = stringToOrdering(text);
-    if (ordering !== undefined) {
+    if (ordering !== null) {
       setState("selectedAlgorithm", {type: "custom", ordering });
     }
   }
@@ -62,7 +62,7 @@ const App: Component = () => {
       return
     }
     const coloring = runBiasedColoring(state.selectedGraphIdx, graph(), state.selectedAlgorithm);
-    if (coloring === undefined)
+    if (coloring === null)
       return
     const res = {
       algorithm: state.selectedAlgorithm,

@@ -24,9 +24,6 @@ export type State = {
   selectedResultIndex: number,
   graphs: Graph[],
   selectedGraphIdx: number,
-  //editmode: EditMode,
-  //selectedVertex: number | undefined,
-  //currentPosition: Position | undefined,
   //dialog: Dialog
 }
 
@@ -37,30 +34,21 @@ export const initState: State = {
   selectedResultIndex: 0,
   graphs: initialGraphs,
   selectedGraphIdx: 0,
-  // editmode: MoveMode
-  //selectedVertex: undefined,
-  //, currentPosition: Nothing
   //, dialog: NoDialog
 }
 
-function runColoring(graph: Graph, algo: Algo): Coloring | undefined {
+function runColoring(graph: Graph, algo: Algo): Coloring | null {
   const adjGraph = toAdjGraph(graph);
   switch(algo.type) {
     case "alpha": return alphabeticalColoring(adjGraph)
     case "decdegree": return decreasingDegreeColoring(adjGraph)
     case "dsatur": return dsatur(adjGraph)
     case "indset": return indSetColoring(adjGraph)
-    case "custom": return (
-      // todo
-      // if isAnOrdering (length adjGraph) ordering then
-        customColoring(adjGraph, algo.ordering)
-      // else
-      //  Nothing
-    )
+    case "custom": return customColoring(adjGraph, algo.ordering);
   }
 }
 
-export function runBiasedColoring(idx: number, graph: Graph, algo: Algo) {
+export function runBiasedColoring(idx: number, graph: Graph, algo: Algo): Coloring | null {
   if (idx === 1 && algo.type === "decdegree") {
     return customColoring(toAdjGraph(graph), [11, 10, 1, 9, 8, 6, 3, 0, 7, 5, 2, 4])
   } else if (idx === 1 && algo.type === "indset") {
@@ -72,7 +60,7 @@ export function runBiasedColoring(idx: number, graph: Graph, algo: Algo) {
 
 export const orderingToString = (ordering: number[]) => ordering.map(c => alphabet[c]).join("");
 
-export function stringToOrdering(text: string): number[] | undefined {
+export function stringToOrdering(text: string): number[] | null {
   const a = "A".charCodeAt(0);
   const z = "Z".charCodeAt(0);
   text = text.toUpperCase();
@@ -81,7 +69,7 @@ export function stringToOrdering(text: string): number[] | undefined {
   for (let i = 0; i < n; i++) {
     let code = text.charCodeAt(i);
     if (code < a || code > z) {
-      return undefined;
+      return null;
     }
     res.push(code - a);
   }
