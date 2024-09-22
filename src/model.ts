@@ -1,7 +1,9 @@
 import { alphabeticalColoring, Coloring, customColoring, decreasingDegreeColoring, dsatur, indSetColoring } from "./coloring";
 import { Graph, initialGraphs, toAdjGraph } from "./graph";
 
-type CustomAlgo = {
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+export type CustomAlgo = {
   type: "custom",
   ordering: number[],
 }
@@ -22,10 +24,10 @@ export type State = {
   selectedResultIndex: number,
   graphs: Graph[],
   selectedGraphIdx: number,
-  //editmode ∷ EditMode,
+  //editmode: EditMode,
   //selectedVertex: number | undefined,
   //currentPosition: Position | undefined,
-  //dialog ∷ Dialog
+  //dialog: Dialog
 }
 
 export const initState: State = {
@@ -67,3 +69,26 @@ export function runBiasedColoring(idx: number, graph: Graph, algo: Algo) {
     return runColoring(graph, algo)
   }
 }
+
+export const orderingToString = (ordering: number[]) => ordering.map(c => alphabet[c]).join("");
+
+export function stringToOrdering(text: string): number[] | undefined {
+  const a = "A".charCodeAt(0);
+  const z = "Z".charCodeAt(0);
+  text = text.toUpperCase();
+  const n = text.length;
+  const res = [];
+  for (let i = 0; i < n; i++) {
+    let code = text.charCodeAt(i);
+    if (code < a || code > z) {
+      return undefined;
+    }
+    res.push(code - a);
+  }
+  return res;
+}
+
+export function isValidOrdering(ordering: number[]): boolean {
+  console.log(ordering.toSorted((a, b) => a - b));
+  return ordering.toSorted((a, b) => a - b).every((i, j) => i === j);
+} 

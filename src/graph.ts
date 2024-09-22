@@ -1,10 +1,13 @@
-type Edge = [number, number];
+import times from "lodash.times";
+import { pseudoRandom } from "./util";
+
+export type Edge = [number, number];
 
 function incident (v: number, [u1, u2]: Edge) {
   return v == u1 || v == u2
 }
 
-type Position = {
+export type Position = {
   x: number,
   y: number,
 }
@@ -42,18 +45,18 @@ export function removeVertex(graph: Graph, v: number): Graph {
   for (let i = 0; i < m; i++) {
     const [u1, u2] = graph.edges[i];
     if (u1 !== v && u2 !== v) {
-      edges.push([u1 > v ? u1 - 1 : u1, u2 > v ? u2 - 1 : v]);
+      edges.push([u1 > v ? u1 - 1 : u1, u2 > v ? u2 - 1 : u2]);
     }
   }
   return {layout, edges};
 }
 
 export function removeEdge(graph: Graph, [u, v]: Edge): Graph {
-  const edges = graph.edges.filter(([u1, v1]) => u == u1 && v == v1 || u == v1 && v == u1);
+  const edges = graph.edges.filter(([u1, v1]) => !(u == u1 && v == v1 || u == v1 && v == u1));
   return {...graph, edges}
 }
 
-export function addEdge(graph: Graph, u: number, v: number) {
+export function addEdge(graph: Graph, u: number, v: number): Graph {
   if (graph.edges.some(([u1, v1]) => u == u1 && v == v1 || u == v1 && v == u1)) {
     return graph
   } else {
@@ -159,4 +162,14 @@ const graph4: Graph = {
   edges: [[0,3], [2,3], [1,2], [0,1], [4,2], [5,4], [9,5], [6,5], [6,9], [7,6], [7,9], [7,8], [8,2], [4,8], [9,8], [4,9]]
 }
 
-export const initialGraphs: Graph[] = [graph1, graph2, graph3, graph4, /*bigGraph, */ emptyGraph, emptyGraph, emptyGraph]
+function bigGraph (): Graph {
+  return {
+    layout: times(100, i => ({ x: 0.02 + pseudoRandom(i * 2) * 0.96, y: 0.02 + pseudoRandom (i * 2 + 1) * 0.96})),
+    edges: times(2000, i => [(100 * pseudoRandom (i * 2)) | 0, (100 * pseudoRandom (i * 2 + 1)) | 0])
+              .filter(([u, v]) => u < v) as Edge[]
+  }
+
+}
+
+
+export const initialGraphs: Graph[] = [graph1, graph2, graph3, graph4, bigGraph(), emptyGraph, emptyGraph, emptyGraph]

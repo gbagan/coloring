@@ -1,28 +1,22 @@
 import range from 'lodash.range';
 import take from 'lodash.take';
 import { Component, Show } from 'solid-js';
-import { Algo, Result, State } from './model';
+import { CustomAlgo, State } from '../model';
+import Result from './ResultView';
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-function algoName(algo: Algo): string {
-  switch(algo.type) {
-    case "alpha": return "Ordre alphabétique";
-    case "decdegree": return "Degré décroissant";
-    case "indset": return "Stables";
-    case "dsatur": return "DSatur";
-    case "custom": return "Personnalisé";
-  }
-} 
-
 type ConfigComponent = Component<{
   state: State,
+  showLetters: boolean,
   setGraph: (idx: number) => void,
   setAlgo: (type: string) => void,
+  setCustomOrdering: (type: string) => void,
   compute: () => void,
   previousStep: () => void,
   nextStep: () => void,
   finishColoring: () => void,
+  setResultIndex: (idx: number) => void
 }>
 
 const Config: ConfigComponent = props => {
@@ -33,9 +27,12 @@ const Config: ConfigComponent = props => {
     return take(result.coloring.map(c => alphabet[c.vertex]), props.state.currentStep).join("");
   }
 
+  const algoOrdering = () =>
+    (props.state.selectedAlgorithm as CustomAlgo).ordering.map(c => alphabet[c]).join("");
+
   return (
     <div class="flex flex-col">
-      <span class="mb-2 mt-4 text-2xl font-bold">Graphe</span>
+      <span class="configtitle">Graphe</span>
       <select class="select"
         value="0"
         onChange={e => props.setGraph(Number(e.currentTarget.value))}
@@ -49,12 +46,12 @@ const Config: ConfigComponent = props => {
         <option value="6">Graphe personnalisé 2</option>
         <option value="7">Graphe personnalisé 3</option>
       </select>
-      <div>
-        <button class="btn rounded-l">Sauvegarder</button>
+      <div class="btngroup">
+        <button class="btn rounded-l-md">Sauvegarder</button>
         <button class="btn">Importer</button>
-        <button class="btn rounded-r">Exporter</button>
+        <button class="btn rounded-r-md">Exporter</button>
       </div>
-      <span class="mb-2 mt-4 text-2xl font-bold">Ordre</span>
+      <span class="configtitle">Ordre</span>
       <select
         class="select"
         value={props.state.selectedAlgorithm.type}
@@ -66,41 +63,36 @@ const Config: ConfigComponent = props => {
         <option value="dsatur">DSatur</option>
         <option value="custom">Personnalisé</option>
       </select>
+      <Show when={props.state.selectedAlgorithm.type === "custom" && props.showLetters}>
+        <input 
+          class="textinput"
+          value={algoOrdering()}
+          onChange={e => props.setCustomOrdering(e.currentTarget.value)}
+          type="text"
+        />    
+      </Show>
       <button class="btn" onClick={props.compute}>Choisir</button>
-      <span class="mb-2 mt-4 text-2xl font-bold">Résultats</span>
+      <span class="configtitle">Résultats</span>
       <ul class="ml-4 list-disc">
         {range(0, 5).map(i => (
-          <ResultView
+          <Result
             idx={i}
             result={props.state.results[i]}
             selected={props.state.selectedResultIndex == i}
+            onClick={() => props.setResultIndex(i)}
           />
         ))}
       </ul>
-      <div>
-        <button class="btn rounded-l" onClick={props.previousStep}>Etape précédente</button>
-        <button class="btn" onClick={props.nextStep}>Etape suivanter</button>
-        <button class="btn rounded-r" onClick={props.finishColoring}> Termine la coloration</button>
+      <div class="btngroup">
+        <button class="btn rounded-l-md" onClick={props.previousStep}>Etape précédente</button>
+        <button class="btn" onClick={props.nextStep}>Etape suivante</button>
+        <button class="btn rounded-r-md" onClick={props.finishColoring}> Terminer la coloration</button>
       </div>
-      <Show when={true}>
+      <Show when={props.showLetters}>
         <span class="text-xl">{partialOrdering()}</span>
       </Show>
     </div>
   )
 }
-
-type ResultComponent = Component<{
-  idx: number,
-  result: Result | undefined
-  selected: boolean,
-}>
-
-const ResultView: ResultComponent = props =>
-  <Show when={props.result} fallback={<li></li>}>
-    <li classList={{"text-blue-600": props.selected}}>
-      {algoName(props.result!.algorithm)}
-      {props.result!.showNbColors && " (" + props.result!.nbColors + " couleurs)"}
-    </li>
-  </Show>
 
 export default Config
