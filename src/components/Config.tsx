@@ -2,7 +2,7 @@ import range from 'lodash.range';
 import take from 'lodash.take';
 import { Component, Show } from 'solid-js';
 import { CustomAlgo, State } from '../model';
-import Result from './ResultView';
+import Result from './Result';
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
