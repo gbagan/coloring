@@ -1,13 +1,16 @@
 import range from 'lodash.range';
 import take from 'lodash.take';
 import { Component, Show } from 'solid-js';
-import { CustomAlgo, State } from '../model';
-import Result from './Result';
+import { Algo, CustomAlgo, Result } from '../model';
+import ResultView from './Result';
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 type ConfigComponent = Component<{
-  state: State,
+  selectedAlgorithm: Algo,
+  currentStep: number,
+  results: Result[],
+  selectedResultIndex: number,
   showLetters: boolean,
   setGraph: (idx: number) => void,
   setAlgo: (type: string) => void,
@@ -21,14 +24,14 @@ type ConfigComponent = Component<{
 
 const Config: ConfigComponent = props => {
   const partialOrdering = () => {
-    const result = props.state.results[props.state.selectedResultIndex];
+    const result = props.results[props.selectedResultIndex];
     if (!result)
       return "";
-    return take(result.coloring.map(c => alphabet[c.vertex]), props.state.currentStep).join("");
+    return take(result.coloring.map(c => alphabet[c.vertex]), props.currentStep).join("");
   }
 
   const algoOrdering = () =>
-    (props.state.selectedAlgorithm as CustomAlgo).ordering.map(c => alphabet[c]).join("");
+    (props.selectedAlgorithm as CustomAlgo).ordering.map(c => alphabet[c]).join("");
 
   return (
     <div class="flex flex-col">
@@ -54,7 +57,7 @@ const Config: ConfigComponent = props => {
       <span class="configtitle">Ordre</span>
       <select
         class="select"
-        value={props.state.selectedAlgorithm.type}
+        value={props.selectedAlgorithm.type}
         onChange={e => props.setAlgo(e.currentTarget.value)}
       >
         <option value="alpha">Alphabétique</option>
@@ -63,7 +66,7 @@ const Config: ConfigComponent = props => {
         <option value="dsatur">DSatur</option>
         <option value="custom">Personnalisé</option>
       </select>
-      <Show when={props.state.selectedAlgorithm.type === "custom" && props.showLetters}>
+      <Show when={props.selectedAlgorithm.type === "custom" && props.showLetters}>
         <input 
           class="textinput"
           value={algoOrdering()}
@@ -75,11 +78,11 @@ const Config: ConfigComponent = props => {
       <span class="configtitle">Résultats</span>
       <ul class="ml-4 list-disc">
         {range(0, 5).map(i => (
-          <Result
+          <ResultView
             idx={i}
-            result={props.state.results[i]}
-            selected={props.state.selectedResultIndex == i}
-            onClick={() => props.setResultIndex(i)}
+            result={props.results[i]}
+            selected={props.selectedResultIndex == i}
+            onClick={[props.setResultIndex, i]}
           />
         ))}
       </ul>

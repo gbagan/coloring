@@ -127,7 +127,6 @@ const App: Component = () => {
   }
 
   const moveVertex = (idx: number, pos: Position) => {
-    //setState(produce(s => s.graphs[s.selectedGraphIdx].layout[idx] = pos))
     setState("graphs", state.selectedGraphIdx, "layout", idx, pos);
   }
 
@@ -143,12 +142,23 @@ const App: Component = () => {
     setState("graphs", state.selectedGraphIdx, g => G.removeEdge(g, edge));
   }
 
+  const clearGraph = () => {
+    setState("graphs", state.selectedGraphIdx, {layout: [], edges: []});
+  }
+
+  const reinitGraph = () => {
+    setState("graphs", state.selectedGraphIdx, G.genGraph(state.selectedGraphIdx));
+  }
+
+
   const graphViewActions = {
     addVertex,
     moveVertex,
     addEdge,
     removeVertex,
     removeEdge,
+    clearGraph,
+    reinitGraph,
   }
 
   // view
@@ -164,17 +174,24 @@ const App: Component = () => {
       </div>
       <Card title="Ordre des couleurs">
         <div class="w-32">
-          <svg viewBox="0 0 20 100">
-            {range(0, 10).map(i =>
+          <svg viewBox="0 0 40 200">
+            {colors.map((color, i) =>
               <>
-                <rect x="0" y={i * 10} width="10" height="10" class={colors[i]} />
-                <text x="12" y={i * 10 + 8} class="graphtext">{i + 1}</text>
+                <rect x="0" y={i * 20} width="20" height="20" class={color} />
+                <text x="24" y={i * 20 + 16} class="graphtext">{i + 1}</text>
               </>
             )}
           </svg>
         </div>
       </Card>
-      <Config state={state} showLetters={nbVertices(graph()) <= 26} {...configActions} />
+      <Config
+        selectedAlgorithm={state.selectedAlgorithm}
+        currentStep={state.currentStep}
+        results={state.results}
+        selectedResultIndex={state.selectedResultIndex}
+        showLetters={nbVertices(graph()) <= 26}
+        {...configActions}
+      />
     </div>
   )
 }

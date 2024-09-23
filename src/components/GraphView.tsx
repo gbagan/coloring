@@ -22,6 +22,8 @@ type GraphComponent = Component<{
   addEdge: (u: number, v: number) => void,
   removeVertex: (idx: number) => void,
   removeEdge: (edge: Edge) => void,
+  clearGraph: () => void,
+  reinitGraph: () => void,
 }>;
 
 const GraphView: GraphComponent = props => {
@@ -49,7 +51,7 @@ const GraphView: GraphComponent = props => {
     }
   }
 
-  const pointerUp = (ev: MouseEvent, idx: number) => {
+  const pointerUp = (idx: number, ev: MouseEvent) => {
     ev.stopPropagation();
     const mode = editMode();
     const idx2 = selectedVertex();
@@ -63,7 +65,7 @@ const GraphView: GraphComponent = props => {
     <div>
       <div class="w-3xl h-3xl">
         <svg
-          viewBox="0 0 100 100"
+          viewBox="0 0 200 200"
           class="block"
           onPointerMove={move}
           onPointerUp={() => editMode() === "adde" && setSelectedVertex(null)}
@@ -80,14 +82,12 @@ const GraphView: GraphComponent = props => {
           <Index each={props.graph.layout}>
             {(pos, i) => (
               <circle
-                cx={100 * pos().x}
-                cy={100 * pos().y}
-                r={props.showLetters ? 4 : 2}
-                stroke-width="0.5"
-                stroke="black"
-                class={"touch-none " + (colors[props.colors[i]] ?? "fill-white")}
-                onPointerDown={() => pointerDown(i)}
-                onPointerUp={e => pointerUp(e, i)}
+                cx={200 * pos().x}
+                cy={200 * pos().y}
+                r={props.showLetters ? 8 : 4}
+                class={"stroke-1 stroke-black touch-none " + (colors[props.colors[i]] ?? "fill-white")}
+                onPointerDown={[pointerDown, i]}
+                onPointerUp={[pointerUp, i]}
                 onClick={() => editMode() === "delete" && props.removeVertex(i)}
               />
             )}
@@ -96,8 +96,8 @@ const GraphView: GraphComponent = props => {
             <Index each={props.graph.layout}>
               {(pos, i) => (
                 <text
-                  x={100 * pos().x - 2}
-                  y={100 * pos().y + 2}
+                  x={200 * pos().x - 4}
+                  y={200 * pos().y + 4}
                   class="graphtext pointer-events-none touch-none select-none"
                 >
                   {alphabet[i]}
@@ -107,23 +107,22 @@ const GraphView: GraphComponent = props => {
           </Show>
           <Show when={editMode() == "adde" && selectedVertex() !== null && pointerPosition()}>
             <line
-              x1={100 * selectedPosition().x}
-              y1={100 * selectedPosition().y}
-              x2={100 * pointerPosition()!.x}
-              y2={100 * pointerPosition()!.y}
-              stroke-width="0.5"
-              class="stroke-blue-500 pointer-events-none"
+              x1={200 * selectedPosition().x}
+              y1={200 * selectedPosition().y}
+              x2={200 * pointerPosition()!.x}
+              y2={200 * pointerPosition()!.y}
+              class="stroke-1 stroke-blue-500 pointer-events-none"
             />
           </Show>
         </svg>
       </div>
       <div class="btngroup">
-        <button class="btn rounded-l-md" onClick={() => setEditMode("move")}>Déplacer</button>
-        <button class="btn" onClick={() => setEditMode("addv")}>Ajouter sommet</button>
-        <button class="btn" onClick={() => setEditMode("adde")}>Ajouter arête</button>
-        <button class="btn" onClick={() => setEditMode("delete")}>Retirer</button>
-        <button class="btn">Tout effacer</button>
-        <button class="btn rounded-r-md">Réinitialiser</button>
+        <button class="btn rounded-l-md" onClick={[setEditMode, "move"]}>Déplacer</button>
+        <button class="btn" onClick={[setEditMode, "addv"]}>Ajouter sommet</button>
+        <button class="btn" onClick={[setEditMode, "adde"]}>Ajouter arête</button>
+        <button class="btn" onClick={[setEditMode, "delete"]}>Retirer</button>
+        <button class="btn" onClick={props.clearGraph}>Tout effacer</button>
+        <button class="btn rounded-r-md" onClick={props.reinitGraph}>Réinitialiser</button>
       </div>
     </div>
   )

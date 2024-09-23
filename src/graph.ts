@@ -77,17 +77,9 @@ export function toAdjGraph(graph: Graph): AdjGraph {
   return adjgraph;
 }
 
-export const emptyGraph: Graph = { layout: [], edges: [] }
+export const emptyGraph: () => Graph = () => ({ layout: [], edges: [] })
 
-/*
-bigGraph =
-  { layout: repeat 100 \i → { x: pseudoRandom (i * 2), y: pseudoRandom (i * 2 + 1) }
-  , edges: (repeat 1000 \i → floor (100.0 * pseudoRandom (i * 2)) ↔ floor (100.0 * pseudoRandom (i * 2 + 1)))
-            # filter \(u ↔ v) → u /= v
-  }
-*/
-
-const graph1: Graph = {
+const graph1: () => Graph = () => ({
   layout: [
     {y: 0.08142857142857143, x: 0.18050000871930805},
     {y: 0.23285714285714285, x: 0.07621429443359375},
@@ -105,9 +97,9 @@ const graph1: Graph = {
     {y: 0.7071428571428572, x:0.6833571515764509},
   ],
   edges: [[1,0], [2,1], [3,2], [4,3], [5,4], [6,5], [7,6], [8,7], [9,8], [10,9], [11,10], [3,11], [12,11], [12,0], [13,9], [7,13], [10,5]]
-}
+});
 
-const graph2: Graph = {
+const graph2: () => Graph = () => ({
   layout: [
     {y: 0.41285714285714287, x: 0.3447857230050223},
     {y: 0.5842857142857143, x: 0.2333571515764509},
@@ -123,9 +115,9 @@ const graph2: Graph = {
     {y: 0.11571428571428571, x: 0.6762142944335937}
   ],
   edges: [[1,0], [1,3], [6,0], [7,6], [9,11], [5,11], [11,0], [3,11], [9,6], [8,9], [4,5], [9,4], [1,7], [10,1], [8,10], [7,8], [10,6], [2,3], [10,2], [8,5]]
-}
+});
 
-const graph3: Graph = {
+const graph3: () => Graph = () => ({
   layout: [
     {y: 0.06714285714285714, x: 0.25050000871930805},
     {y: 0.17142857142857143, x: 0.09192858014787947},
@@ -144,9 +136,9 @@ const graph3: Graph = {
     {y: 0.6385714285714286, x: 0.07764286586216518},
   ],
   edges: [[2,1], [0,2], [1,0], [3,2], [4,3], [2,4], [5,2], [6,5], [7,6], [2,7], [8,7], [9,8], [10,9], [7,10], [8,10], [9,7], [11,10], [12,11], [13,12], [14,13], [7,14]]
-}
+})
 
-const graph4: Graph = {
+const graph4: () => Graph = () => ({
   layout: [
     {y: 0.4514285714285714, x: 0.03907143729073661},
     {y: 0.3385714285714286, x:0.14478572300502232},
@@ -160,16 +152,16 @@ const graph4: Graph = {
     {y: 0.4742857142857143, x:0.6733571515764509},
   ],
   edges: [[0,3], [2,3], [1,2], [0,1], [4,2], [5,4], [9,5], [6,5], [6,9], [7,6], [7,9], [7,8], [8,2], [4,8], [9,8], [4,9]]
-}
+});
 
-function bigGraph (): Graph {
-  return {
-    layout: times(100, i => ({ x: 0.02 + pseudoRandom(i * 2) * 0.96, y: 0.02 + pseudoRandom (i * 2 + 1) * 0.96})),
-    edges: times(2000, i => [(100 * pseudoRandom (i * 2)) | 0, (100 * pseudoRandom (i * 2 + 1)) | 0])
+const bigGraph: () => Graph = () => ({
+  layout: times(100, i => ({ x: 0.02 + pseudoRandom(i * 2) * 0.96, y: 0.02 + pseudoRandom (i * 2 + 1) * 0.96})),
+  edges: times(2000, i => [(100 * pseudoRandom (i * 2)) | 0, (100 * pseudoRandom (i * 2 + 1)) | 0])
               .filter(([u, v]) => u < v) as Edge[]
-  }
+});
 
-}
+const graphFns: (() => Graph)[] = [graph1, graph2, graph3, graph4, bigGraph, emptyGraph, emptyGraph, emptyGraph];
 
+export const genGraph = (i: number) => graphFns[i]();
 
-export const initialGraphs: Graph[] = [graph1, graph2, graph3, graph4, bigGraph(), emptyGraph, emptyGraph, emptyGraph]
+export const initialGraphs: Graph[] = [graph1(), graph2(), graph3(), graph4(), bigGraph(), emptyGraph(), emptyGraph(), emptyGraph()];

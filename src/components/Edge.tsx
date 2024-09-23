@@ -7,12 +7,11 @@ type EdgeComponent = Component<{
   
 const Edge: EdgeComponent = props =>
   <line
-    x1={100 * props.coords.x1}
-    x2={100 * props.coords.x2}
-    y1={100 * props.coords.y1}
-    y2={100 * props.coords.y2}
-    stroke-width="0.5"
-    class="stroke-blue-500"
+    x1={200 * props.coords.x1}
+    x2={200 * props.coords.x2}
+    y1={200 * props.coords.y1}
+    y2={200 * props.coords.y2}
+    class="stroke-1 stroke-blue-500"
     onClick={props.onClick}
   />
 

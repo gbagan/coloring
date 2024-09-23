@@ -1,4 +1,4 @@
-import { Component, Show } from "solid-js"
+import { Component, JSX, Show } from "solid-js"
 import { Algo, orderingToString, Result } from "../model"
 
 function algoName(algo: Algo): string {
@@ -15,7 +15,7 @@ type ResultComponent = Component<{
   idx: number,
   result: Result | null
   selected: boolean,
-  onClick: () => void,
+  onClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent>,
 }>
 
 const ResultView: ResultComponent = props =>
