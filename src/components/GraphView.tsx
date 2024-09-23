@@ -96,8 +96,9 @@ const GraphView: GraphComponent = props => {
             <Index each={props.graph.layout}>
               {(pos, i) => (
                 <text
-                  x={200 * pos().x - 4}
+                  x={200 * pos().x}
                   y={200 * pos().y + 4}
+                  text-anchor="middle"
                   class="graphtext pointer-events-none touch-none select-none"
                 >
                   {alphabet[i]}
