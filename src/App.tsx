@@ -10,9 +10,9 @@ import { Algo, initState, isValidOrdering, runBiasedColoring, stringToOrdering }
 import { colors } from './colors';
 import { Edge, nbVertices, Position } from './graph';
 import * as G from './graph';
+import toast, { Toaster } from 'solid-toast';
 
 const App: Component = () => {
-  let exportDialog: HTMLDialogElement;
   let importDialog: HTMLDialogElement;
 
   const [state, setState] = createStore(initState);
@@ -75,6 +75,7 @@ const App: Component = () => {
     }
     batch(() => {
       setState("results", results => take([res, ...results], 5));
+      setState("selectedResultIndex", 0);
       setState("currentStep", 0);
     });
   }
@@ -121,6 +122,7 @@ const App: Component = () => {
     }
     const json = JSON.stringify(graph());
     window.localStorage.setItem(`coloring-graph-${idx}`, json);
+    toast.success("Le graphe sauvegardé sur votre machine");
   }
 
   const openImportDialog = () => {
@@ -131,15 +133,17 @@ const App: Component = () => {
   const importGraph = () => {
     const json = state.dialogContent;
     const graph = G.jsonToGraph(json);
-    if (graph !== null) {
+    if (graph === null) {
+      toast.error("Le texte n'est pas valide");
+    } else {
       setState("graphs", state.selectedGraphIdx, graph);
       importDialog.close();
     }
   }
 
-  const openExportDialog = () => {
-    setState("dialogContent", JSON.stringify(graph()));
-    exportDialog.showModal();
+  const exportGraph = () => {
+    navigator.clipboard.writeText(JSON.stringify(graph()));
+    toast.success("Le graphe a été copié dans le presse-papier");
   }
 
   const configActions = {
@@ -153,7 +157,7 @@ const App: Component = () => {
     setResultIndex,
     saveGraph,
     openImportDialog,
-    openExportDialog,
+    exportGraph,
   }
 
   const addVertex = (pos: Position) => {
@@ -198,6 +202,7 @@ const App: Component = () => {
   // view
   return (
     <div class="flex flex-row justify-around items-start">
+      <Toaster position="top-right" />
       <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
         <GraphView
           graph={graph()}
@@ -226,22 +231,6 @@ const App: Component = () => {
         showLetters={nbVertices(graph()) <= 26}
         {...configActions}
       />
-      <dialog ref={el => (exportDialog = el)} class="dialog">
-        <div class="dialogtitle">Exporter un graphe</div>
-        <div class="p-6 border-b-2" >
-          <textarea
-            class="textarea"
-            cols="100"
-            rows="20"
-            readonly
-          >
-            {state.dialogContent}
-          </textarea>
-        </div>
-        <div class="p-4 text-right">
-          <button class="btn rounded-md" onClick={() => exportDialog.close()}>OK</button>
-        </div>
-      </dialog>
       <dialog ref={el => (importDialog = el)} class="dialog">
         <div class="dialogtitle">Importer un graphe</div>
         <div class="p-6 border-b-2" >
@@ -256,7 +245,7 @@ const App: Component = () => {
         </div>
         <div class="p-4 text-right">
           <button class="btn rounded-md" onClick={() => importDialog.close()}>Annuler</button>
-          <button class="btn rounded-md" onClick={importGraph}>OK</button>
+          <button class="btn rounded-md" autofocus onClick={importGraph}>OK</button>
         </div>
       </dialog>
     </div>

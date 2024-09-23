@@ -22,7 +22,7 @@ type ConfigComponent = Component<{
   setResultIndex: (idx: number) => void,
   saveGraph: () => void,
   openImportDialog: () => void,
-  openExportDialog: () => void,
+  exportGraph: () => void,
 }>
 
 const Config: ConfigComponent = props => {
@@ -55,7 +55,7 @@ const Config: ConfigComponent = props => {
       <div class="btngroup">
         <button class="btn rounded-l-md" onClick={props.saveGraph}>Sauvegarder</button>
         <button class="btn" onClick={props.openImportDialog}>Importer</button>
-        <button class="btn rounded-r-md" onClick={props.openExportDialog}>Exporter</button>
+        <button class="btn rounded-r-md" onClick={props.exportGraph}>Exporter</button>
       </div>
       <span class="configtitle">Ordre</span>
       <select
@@ -90,9 +90,27 @@ const Config: ConfigComponent = props => {
         ))}
       </ul>
       <div class="btngroup">
-        <button class="btn rounded-l-md" onClick={props.previousStep}>Etape précédente</button>
-        <button class="btn" onClick={props.nextStep}>Etape suivante</button>
-        <button class="btn rounded-r-md" onClick={props.finishColoring}> Terminer la coloration</button>
+        <button
+          class="btn rounded-l-md"
+          disabled={props.results.length === 0}
+          onClick={props.previousStep}
+        >
+          Etape précédente
+        </button>
+        <button
+          class="btn"
+          disabled={props.results.length === 0}
+          onClick={props.nextStep}
+        >
+          Etape suivante
+        </button>
+        <button
+          class="btn rounded-r-md"
+          disabled={props.results.length === 0}
+          onClick={props.finishColoring}
+        >
+          Terminer la coloration
+        </button>
       </div>
       <Show when={props.showLetters}>
         <span class="text-xl">{partialOrdering()}</span>
