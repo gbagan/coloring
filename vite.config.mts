@@ -16,7 +16,8 @@ export default defineConfig({
         textarea: "block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500",
         textinput: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5",
         configtitle: "mb-2 mt-4 text-2xl font-bold",
-        dialog: "bg-white text-black rounded border-2",
+        dialog: "bg-white rounded-lg shadow backdrop:bg-gray backdrop:bg-op-70",
+        dialogtitle: "p-4 min-h-8 border-b-2 text-4xl font-medium",
       }
     }),
     solidPlugin(),

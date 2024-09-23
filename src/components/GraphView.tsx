@@ -27,9 +27,9 @@ type GraphComponent = Component<{
 }>;
 
 const GraphView: GraphComponent = props => {
-  const [editMode, setEditMode] = createSignal("move" as EditMode);
-  const [pointerPosition, setPointerPosition] = createSignal(null as Position | null);
-  const [selectedVertex, setSelectedVertex] = createSignal(null as number | null);
+  const [editMode, setEditMode] = createSignal<EditMode>("move");
+  const [pointerPosition, setPointerPosition] = createSignal<Position | null>(null);
+  const [selectedVertex, setSelectedVertex] = createSignal<number | null>(null);
 
   const selectedPosition = () => props.graph.layout[selectedVertex()!];
 

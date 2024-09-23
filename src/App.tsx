@@ -227,7 +227,7 @@ const App: Component = () => {
         {...configActions}
       />
       <dialog ref={el => (exportDialog = el)} class="dialog">
-        <div class="p-4 min-h-8 border-b-2 text-4xl font-medium">Exporter un graphe</div>
+        <div class="dialogtitle">Exporter un graphe</div>
         <div class="p-6 border-b-2" >
           <textarea
             class="textarea"
@@ -243,7 +243,7 @@ const App: Component = () => {
         </div>
       </dialog>
       <dialog ref={el => (importDialog = el)} class="dialog">
-        <div class="p-4 min-h-8 border-b-2 text-4xl font-medium">Importer un graphe</div>
+        <div class="dialogtitle">Importer un graphe</div>
         <div class="p-6 border-b-2" >
           <textarea
             class="textarea"

@@ -76,7 +76,5 @@ export function stringToOrdering(text: string): number[] | null {
   return res;
 }
 
-export function isValidOrdering(ordering: number[]): boolean {
-  console.log(ordering.toSorted((a, b) => a - b));
-  return ordering.toSorted((a, b) => a - b).every((i, j) => i === j);
-} 
+export const isValidOrdering = (ordering: number[]) =>
+  ordering.toSorted((a, b) => a - b).every((i, j) => i === j);
