@@ -10,7 +10,6 @@ import { Algo, initState, isValidOrdering, runBiasedColoring, stringToOrdering }
 import { colors } from './colors';
 import { Edge, nbVertices, Position } from './graph';
 import * as G from './graph';
-import { jsonToGraph } from './validator';
 
 const App: Component = () => {
   let exportDialog: HTMLDialogElement;
@@ -115,6 +114,15 @@ const App: Component = () => {
     }))
   }
 
+  const saveGraph = () => {
+    const idx = state.selectedGraphIdx;
+    if (idx < 5) {
+      return;
+    }
+    const json = JSON.stringify(graph());
+    window.localStorage.setItem(`coloring-graph-${idx}`, json);
+  }
+
   const openImportDialog = () => {
     setState("dialogContent", "");
     importDialog.showModal();
@@ -122,7 +130,7 @@ const App: Component = () => {
 
   const importGraph = () => {
     const json = state.dialogContent;
-    const graph = jsonToGraph(json);
+    const graph = G.jsonToGraph(json);
     if (graph !== null) {
       setState("graphs", state.selectedGraphIdx, graph);
       importDialog.close();
@@ -143,6 +151,7 @@ const App: Component = () => {
     nextStep,
     finishColoring,
     setResultIndex,
+    saveGraph,
     openImportDialog,
     openExportDialog,
   }
@@ -217,10 +226,8 @@ const App: Component = () => {
         showLetters={nbVertices(graph()) <= 26}
         {...configActions}
       />
-      <dialog ref={el => (exportDialog = el)} class="bg-white text-black rounded border-2">
-        <div class="p-4 min-h-8 border-b-2">
-          <div class="text-4xl font-medium inline-block">Exporter un graphe</div>
-        </div>
+      <dialog ref={el => (exportDialog = el)} class="dialog">
+        <div class="p-4 min-h-8 border-b-2 text-4xl font-medium">Exporter un graphe</div>
         <div class="p-6 border-b-2" >
           <textarea
             class="textarea"
@@ -235,10 +242,8 @@ const App: Component = () => {
           <button class="btn rounded-md" onClick={() => exportDialog.close()}>OK</button>
         </div>
       </dialog>
-      <dialog ref={el => (importDialog = el)} class="bg-white text-black rounded border-2">
-        <div class="p-4 min-h-8 border-b-2">
-          <div class="text-4xl font-medium inline-block">Importer un graphe</div>
-        </div>
+      <dialog ref={el => (importDialog = el)} class="dialog">
+        <div class="p-4 min-h-8 border-b-2 text-4xl font-medium">Importer un graphe</div>
         <div class="p-6 border-b-2" >
           <textarea
             class="textarea"

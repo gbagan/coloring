@@ -19,7 +19,8 @@ type ConfigComponent = Component<{
   previousStep: () => void,
   nextStep: () => void,
   finishColoring: () => void,
-  setResultIndex: (idx: number) => void
+  setResultIndex: (idx: number) => void,
+  saveGraph: () => void,
   openImportDialog: () => void,
   openExportDialog: () => void,
 }>
@@ -52,7 +53,7 @@ const Config: ConfigComponent = props => {
         <option value="7">Graphe personnalisé 3</option>
       </select>
       <div class="btngroup">
-        <button class="btn rounded-l-md">Sauvegarder</button>
+        <button class="btn rounded-l-md" onClick={props.saveGraph}>Sauvegarder</button>
         <button class="btn" onClick={props.openImportDialog}>Importer</button>
         <button class="btn rounded-r-md" onClick={props.openExportDialog}>Exporter</button>
       </div>
