@@ -10,8 +10,12 @@ import { Algo, initState, isValidOrdering, runBiasedColoring, stringToOrdering }
 import { colors } from './colors';
 import { Edge, nbVertices, Position } from './graph';
 import * as G from './graph';
+import { jsonToGraph } from './validator';
 
 const App: Component = () => {
+  let exportDialog: HTMLDialogElement;
+  let importDialog: HTMLDialogElement;
+
   const [state, setState] = createStore(initState);
 
   const graph = () => state.graphs[state.selectedGraphIdx];
@@ -33,7 +37,7 @@ const App: Component = () => {
     setState(produce(state => {
       state.selectedGraphIdx = idx;
       state.results = [];
-      state.selectedAlgorithm = {type: "alpha"};
+      state.selectedAlgorithm = { type: "alpha" };
       state.selectedResultIndex = 0;
       state.currentStep = 0;
     }))
@@ -52,7 +56,7 @@ const App: Component = () => {
   const setCustomOrdering = (text: string) => {
     const ordering = stringToOrdering(text);
     if (ordering !== null) {
-      setState("selectedAlgorithm", {type: "custom", ordering });
+      setState("selectedAlgorithm", { type: "custom", ordering });
     }
   }
 
@@ -111,6 +115,25 @@ const App: Component = () => {
     }))
   }
 
+  const openImportDialog = () => {
+    setState("dialogContent", "");
+    importDialog.showModal();
+  }
+
+  const importGraph = () => {
+    const json = state.dialogContent;
+    const graph = jsonToGraph(json);
+    if (graph !== null) {
+      setState("graphs", state.selectedGraphIdx, graph);
+      importDialog.close();
+    }
+  }
+
+  const openExportDialog = () => {
+    setState("dialogContent", JSON.stringify(graph()));
+    exportDialog.showModal();
+  }
+
   const configActions = {
     setGraph,
     setAlgo,
@@ -120,6 +143,8 @@ const App: Component = () => {
     nextStep,
     finishColoring,
     setResultIndex,
+    openImportDialog,
+    openExportDialog,
   }
 
   const addVertex = (pos: Position) => {
@@ -143,7 +168,7 @@ const App: Component = () => {
   }
 
   const clearGraph = () => {
-    setState("graphs", state.selectedGraphIdx, {layout: [], edges: []});
+    setState("graphs", state.selectedGraphIdx, { layout: [], edges: [] });
   }
 
   const reinitGraph = () => {
@@ -192,6 +217,43 @@ const App: Component = () => {
         showLetters={nbVertices(graph()) <= 26}
         {...configActions}
       />
+      <dialog ref={el => (exportDialog = el)} class="bg-white text-black rounded border-2">
+        <div class="p-4 min-h-8 border-b-2">
+          <div class="text-4xl font-medium inline-block">Exporter un graphe</div>
+        </div>
+        <div class="p-6 border-b-2" >
+          <textarea
+            class="textarea"
+            cols="100"
+            rows="20"
+            readonly
+          >
+            {state.dialogContent}
+          </textarea>
+        </div>
+        <div class="p-4 text-right">
+          <button class="btn rounded-md" onClick={() => exportDialog.close()}>OK</button>
+        </div>
+      </dialog>
+      <dialog ref={el => (importDialog = el)} class="bg-white text-black rounded border-2">
+        <div class="p-4 min-h-8 border-b-2">
+          <div class="text-4xl font-medium inline-block">Importer un graphe</div>
+        </div>
+        <div class="p-6 border-b-2" >
+          <textarea
+            class="textarea"
+            cols="100"
+            rows="20"
+            onChange={e => setState("dialogContent", e.currentTarget.value)}
+          >
+            {state.dialogContent}
+          </textarea>
+        </div>
+        <div class="p-4 text-right">
+          <button class="btn rounded-md" onClick={() => importDialog.close()}>Annuler</button>
+          <button class="btn rounded-md" onClick={importGraph}>OK</button>
+        </div>
+      </dialog>
     </div>
   )
 }

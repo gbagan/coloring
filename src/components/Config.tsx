@@ -20,6 +20,8 @@ type ConfigComponent = Component<{
   nextStep: () => void,
   finishColoring: () => void,
   setResultIndex: (idx: number) => void
+  openImportDialog: () => void,
+  openExportDialog: () => void,
 }>
 
 const Config: ConfigComponent = props => {
@@ -51,8 +53,8 @@ const Config: ConfigComponent = props => {
       </select>
       <div class="btngroup">
         <button class="btn rounded-l-md">Sauvegarder</button>
-        <button class="btn">Importer</button>
-        <button class="btn rounded-r-md">Exporter</button>
+        <button class="btn" onClick={props.openImportDialog}>Importer</button>
+        <button class="btn rounded-r-md" onClick={props.openExportDialog}>Exporter</button>
       </div>
       <span class="configtitle">Ordre</span>
       <select

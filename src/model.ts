@@ -24,7 +24,7 @@ export type State = {
   selectedResultIndex: number,
   graphs: Graph[],
   selectedGraphIdx: number,
-  //dialog: Dialog
+  dialogContent: string
 }
 
 export const initState: State = {
@@ -34,7 +34,7 @@ export const initState: State = {
   selectedResultIndex: 0,
   graphs: initialGraphs,
   selectedGraphIdx: 0,
-  //, dialog: NoDialog
+  dialogContent: ""
 }
 
 function runColoring(graph: Graph, algo: Algo): Coloring | null {
