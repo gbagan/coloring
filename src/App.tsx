@@ -122,23 +122,27 @@ const App: Component = () => {
     }
     const json = JSON.stringify(graph());
     window.localStorage.setItem(`coloring-graph-${idx}`, json);
-    toast.success("Le graphe sauvegardé sur votre machine");
+    toast.success("Le graphe a été sauvegardé sur votre machine");
   }
 
   const openImportDialog = () => {
-    setState("dialogContent", "");
-    importDialog.showModal();
+    navigator.clipboard
+      .readText()
+      .then(text => {
+        setState("dialogContent", text);
+        importDialog.showModal();
+      })
   }
 
   const importGraph = () => {
     const json = state.dialogContent;
     const graph = G.jsonToGraph(json);
     if (graph === null) {
-      toast.error("Le texte n'est pas valide");
+      toast.error("Le texte que vous avez entré ne représente pas un graph valide");
     } else {
       setState("graphs", state.selectedGraphIdx, graph);
-      importDialog.close();
     }
+    importDialog.close();
   }
 
   const exportGraph = () => {
@@ -212,7 +216,7 @@ const App: Component = () => {
         />
       </div>
       <Card title="Ordre des couleurs">
-        <div class="w-32">
+        <div class="w-16 xl-w-24 2xl-w-32">
           <svg viewBox="0 0 40 200">
             {colors.map((color, i) =>
               <>

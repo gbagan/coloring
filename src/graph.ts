@@ -3,10 +3,6 @@ import { pseudoRandom } from "./util";
 
 export type Edge = [number, number];
 
-function incident (v: number, [u1, u2]: Edge) {
-  return v == u1 || v == u2
-}
-
 export type Position = {
   x: number,
   y: number,
@@ -103,11 +99,7 @@ export function jsonToGraph (json: string): Graph | null {
 
   try {
     const obj = JSON.parse(json);
-    if (isValidGraph(obj)) {
-      return obj as Graph;
-    } else {
-      return null;
-    }
+    return isValidGraph(obj) ? obj as Graph : null;
   } catch {
     return null;
   }
