@@ -219,7 +219,7 @@ const App: Component = () => {
         />
       </div>
       <Card title="Ordre des couleurs">
-        <div class="w-16 xl-w-24 2xl-w-32">
+        <div class="w-16 xl:w-24 2xl:w-32">
           <svg viewBox="0 0 40 200">
             {colors.map((color, i) =>
               <>

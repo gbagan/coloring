@@ -65,7 +65,7 @@ const GraphView: GraphComponent = props => {
 
   return (
     <div>
-      <div class="w-full xl-w-xl 2xl-w-3xl touch-none">
+      <div class="xl:w-[567px] 2xl:w-[768px] touch-none">
         <svg
           viewBox="0 0 200 200"
           class="block"
@@ -88,7 +88,7 @@ const GraphView: GraphComponent = props => {
                 cx={200 * pos().x}
                 cy={200 * pos().y}
                 r={props.showLetters ? 8 : 4}
-                class={(colors[props.colors[i]] ?? "fill-white") + " stroke-1 stroke-black hoverable"}
+                class={(colors[props.colors[i]] ?? "fill-white") + " stroke-1 stroke-black vertex"}
                 onPointerDown={[pointerDown, i]}
                 onPointerUp={[pointerUp, i]}
                 onClick={() => editMode() === "delete" && props.removeVertex(i)}
