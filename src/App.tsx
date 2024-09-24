@@ -130,6 +130,9 @@ const App: Component = () => {
       .readText()
       .then(text => {
         setState("dialogContent", text);
+      }).catch(() => {
+        setState("dialogContent", "");
+      }).finally(() => {
         importDialog.showModal();
       })
   }

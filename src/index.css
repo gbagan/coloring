@@ -1,0 +1,8 @@
+.deletemode > .hoverable:hover {
+    fill: gray;
+}
+
+.deletemode > .edge:hover {
+    stroke: gray;
+    stroke-width: 2;
+}

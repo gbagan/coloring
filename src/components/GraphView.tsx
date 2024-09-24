@@ -69,6 +69,7 @@ const GraphView: GraphComponent = props => {
         <svg
           viewBox="0 0 200 200"
           class="block"
+          classList={{deletemode: editMode() === "delete"}}
           onPointerMove={move}
           onPointerUp={() => editMode() === "adde" && setSelectedVertex(null)}
           onClick={e => editMode() === "addv" && props.addVertex(getPointerPosition(e))}
@@ -77,7 +78,6 @@ const GraphView: GraphComponent = props => {
             {edge => (
               <EdgeView
                 coords={getCoordsOfEdge(props.graph, edge)}
-                deleteMode={editMode() === "delete"}
                 onClick={() => editMode() === "delete" && props.removeEdge(edge)}
               />
             )}
@@ -88,8 +88,7 @@ const GraphView: GraphComponent = props => {
                 cx={200 * pos().x}
                 cy={200 * pos().y}
                 r={props.showLetters ? 8 : 4}
-                class={"stroke-1 stroke-black " + (colors[props.colors[i]] ?? "fill-white")}
-                classList={{"hover:fill-gray": editMode() === "delete"}}
+                class={(colors[props.colors[i]] ?? "fill-white") + " stroke-1 stroke-black hoverable"}
                 onPointerDown={[pointerDown, i]}
                 onPointerUp={[pointerUp, i]}
                 onClick={() => editMode() === "delete" && props.removeVertex(i)}
