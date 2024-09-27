@@ -38,7 +38,7 @@ const Config: ConfigComponent = props => {
 
   return (
     <div class="flex flex-col">
-      <span class="configtitle">Graphe</span>
+      <span class="config-title">Graphe</span>
       <select class="select"
         value="0"
         onChange={e => props.setGraph(Number(e.currentTarget.value))}
@@ -57,7 +57,7 @@ const Config: ConfigComponent = props => {
         <button class="btn" onClick={props.openImportDialog}>Importer</button>
         <button class="btn rounded-r-md" onClick={props.exportGraph}>Exporter</button>
       </div>
-      <span class="configtitle">Ordre</span>
+      <span class="config-title">Ordre</span>
       <select
         class="select"
         value={props.selectedAlgorithm.type}
@@ -78,7 +78,7 @@ const Config: ConfigComponent = props => {
         />    
       </Show>
       <button class="btn" onClick={props.compute}>Choisir</button>
-      <span class="configtitle">Résultats</span>
+      <span class="config-title">Résultats</span>
       <ul class="ml-4 list-disc">
         {range(0, 5).map(i => (
           <ResultView

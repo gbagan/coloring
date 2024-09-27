@@ -219,7 +219,7 @@ const App: Component = () => {
         />
       </div>
       <Card title="Ordre des couleurs">
-        <div class="w-16 xl:w-24 2xl:w-32">
+        <div class="w-32">
           <svg viewBox="0 0 40 200">
             {colors.map((color, i) =>
               <>
@@ -239,8 +239,8 @@ const App: Component = () => {
         {...configActions}
       />
       <dialog ref={el => (importDialog = el)} class="dialog">
-        <div class="dialogtitle">Importer un graphe</div>
-        <div class="p-6 border-b-2" >
+        <div class="dialog-title">Importer un graphe</div>
+        <div class="dialog-body" >
           <textarea
             class="textarea"
             cols="100"
@@ -250,9 +250,9 @@ const App: Component = () => {
             {state.dialogContent}
           </textarea>
         </div>
-        <div class="p-4 text-right">
-          <button class="btn rounded-md" onClick={() => importDialog.close()}>Annuler</button>
-          <button class="btn rounded-md" autofocus onClick={importGraph}>OK</button>
+        <div class="dialog-buttons">
+          <button class="btn rounded-lg" onClick={() => importDialog.close()}>Annuler</button>
+          <button class="btn rounded-lg" autofocus onClick={importGraph}>OK</button>
         </div>
       </dialog>
     </div>

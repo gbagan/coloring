@@ -65,7 +65,7 @@ const GraphView: GraphComponent = props => {
 
   return (
     <div>
-      <div class="xl:w-[567px] 2xl:w-[768px] touch-none">
+      <div class="w-[160] touch-none">
         <svg
           viewBox="0 0 200 200"
           class="block"
