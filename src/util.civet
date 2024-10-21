@@ -1,0 +1,8 @@
+export function replicate<A>(n: number, val: A): A[]
+  let arr = new Array n
+  arr.fill val
+  arr
+
+export pseudoRandom := (n: number) =>
+  m := 100 * Math.sin(n + 1)
+  m - Math.floor(m)

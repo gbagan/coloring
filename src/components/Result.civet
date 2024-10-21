@@ -1,0 +1,25 @@
+import { Component, JSX, Show } from "solid-js"
+import { Algo, orderingToString, Result } from "../model.civet"
+
+algoName := (algo: Algo) =>
+  switch algo.type
+    "alpha" "Ordre alphabétique"
+    "decdegree" "Degré décroissant"
+    "indset" "Stables"
+    "dsatur" "DSatur"
+    "custom" orderingToString((algo as any).ordering)
+
+type ResultComponent = Component<{
+  idx: number
+  result: Result | null
+  selected: boolean,
+  onClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent>,
+}>
+
+ResultView: ResultComponent := (props) =>
+  <Show when=props.result fallback=<li/>>
+    <li classList={{ "text-blue-600": props.selected }} onClick=props.onClick>
+      {algoName(props.result!.algorithm)}
+      {props.result!.showNbColors && " (" + props.result!.nbColors + " couleurs)"}
+
+export default ResultView

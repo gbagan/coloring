@@ -1,0 +1,71 @@
+import { replicate } from './util.civet'
+import { AdjGraph } from "./graph.civet"
+import range from "lodash.range"
+import zip from "lodash.zip"
+import uniq from "lodash.uniq"
+import maxBy from "lodash.maxby"
+
+export type Coloring = { vertex: number, color: number }[];
+
+function firstAvailableColor(graph: AdjGraph, coloring: number[], u: number): number
+  adjColors := graph[u].map(coloring[&])
+  i .= 0
+  loop
+    if !adjColors.includes(i)
+      return i
+    i++
+
+colorWithFirstAvailable := (graph: AdjGraph, coloring: number[], u: number) =>
+  c := firstAvailableColor(graph, coloring, u)
+  coloring[u] = c
+  c
+
+export function customColoring(graph: AdjGraph, ordering: number[]): Coloring
+  coloring := replicate(ordering.length, -1)
+  for v of ordering
+    colorWithFirstAvailable graph, coloring, v
+  ordering.map (v) => {vertex: v, color: coloring[v]}
+
+export alphabeticalColoring := (graph: AdjGraph) =>
+  customColoring graph, range(0, graph.length)
+
+export decreasingDegreeColoring := (graph: AdjGraph) => 
+  ordering := range(0, graph.length).toSorted((a, b) => graph[b].length - graph[a].length)
+  customColoring graph, ordering
+
+export indSetColoring := (graph: AdjGraph) =>
+  ordering := range(0, graph.length).toSorted((a, b) => graph[b].length - graph[a].length);
+  result: Coloring := []
+  color .= 0
+  colored := replicate graph.length, false
+  while result.length < graph.length
+    adjArray := replicate graph.length, false
+    for v of ordering
+      if colored[v] || adjArray[v]
+        continue
+      result.push { vertex: v, color}
+      colored[v] = true
+      for u of graph[v]
+        adjArray[u] = true
+    color++
+  result
+
+function dsaturStep(graph: AdjGraph, colors: number[]): number | null
+  order :=
+    zip(range(0, graph.length), graph, colors) 
+    .filter [,,color] => color === -1
+    .map [v, nbor] =>
+      vertex: v!
+      saturation: uniq(nbor!.map(colors[&]).filter(& !== -1)).length
+      degree: nbor!.length
+  maxBy(order, (o)=>o.saturation*10000+o.degree)?.vertex ?? null
+
+export dsatur := (graph: AdjGraph) =>
+  colors := replicate graph.length, -1
+  result: Coloring := [] 
+  loop
+    let v = dsaturStep(graph, colors);
+    if v === null
+      return result
+    c := colorWithFirstAvailable graph, colors, v
+    result.push {vertex: v, color: c}

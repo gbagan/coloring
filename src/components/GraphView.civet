@@ -1,0 +1,114 @@
+import { Component, createSignal, For, Index, Show } from 'solid-js'
+import { Edge, getCoordsOfEdge, Graph, Position } from '../graph.civet'
+import { colors } from '../colors.civet'
+import EdgeView from './Edge.civet'
+
+alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+type EditMode = "move" | "addv" | "adde" | "delete"
+
+function getPointerPosition(e: MouseEvent): Position
+  el := e.currentTarget as Element
+  { left, top, width, height } := el.getBoundingClientRect()
+  { x: (e.clientX - left) / width, y: (e.clientY - top) / height }
+
+type GraphComponent = Component<{
+  graph: Graph
+  colors: number[]
+  showLetters: boolean
+  addVertex: (pos: Position) => void
+  moveVertex: (idx: number, pos: Position) => void
+  addEdge: (u: number, v: number) => void
+  removeVertex: (idx: number) => void
+  removeEdge: (edge: Edge) => void
+  clearGraph: () => void
+  reinitGraph: () => void
+}>
+
+GraphView: GraphComponent := (props) =>
+  [editMode, setEditMode] := createSignal<EditMode> "move"
+  [pointerPosition, setPointerPosition] := createSignal<Position | null> null
+  [selectedVertex, setSelectedVertex] := createSignal<number | null> null
+
+  selectedPosition := => props.graph.layout[selectedVertex()!]
+
+  move := (ev: MouseEvent) =>
+    pos := getPointerPosition(ev)
+    idx := selectedVertex()
+    mode := editMode()
+    if mode === "move" && idx !== null
+      props.moveVertex idx, pos
+    else if mode === "adde"
+      setPointerPosition pos
+
+  pointerDown := (idx: number, e: PointerEvent) =>
+    mode := editMode()
+    if mode === "move" || mode === "adde"
+      if e.currentTarget
+        (e.currentTarget as Element).releasePointerCapture e.pointerId
+      setSelectedVertex idx
+
+  pointerUp := (idx: number, ev: MouseEvent) =>
+    ev.stopPropagation()
+    mode := editMode()
+    idx2 := selectedVertex()
+    if mode === "adde" && idx2 !== null && idx2 !== idx
+      props.addEdge idx, idx2
+    setSelectedVertex null
+
+  <div>
+    <div class="w-[160] touch-none">
+      <svg
+        viewBox="0 0 200 200"
+        class="block"
+        classList={{deletemode: editMode() === "delete"}}
+        onPointerMove={move}
+        onPointerUp={() => editMode() === "adde" && setSelectedVertex(null)}
+        onClick={(e) => editMode() === "addv" && props.addVertex(getPointerPosition(e))}
+      >
+        <For each={props.graph.edges}>
+          {(edge) =>
+            <EdgeView
+              coords={getCoordsOfEdge(props.graph, edge)}
+              onClick={() => editMode() === "delete" && props.removeEdge(edge)}
+            />
+          }
+        <Index each={props.graph.layout}>
+          {(pos, i) => (
+            <circle
+              cx={200 * pos().x}
+              cy={200 * pos().y}
+              r={props.showLetters ? 8 : 4}
+              class={(colors[props.colors[i]] ?? "fill-white") + " stroke-1 stroke-black vertex"}
+              onPointerDown={[pointerDown, i]}
+              onPointerUp={[pointerUp, i]}
+              onClick={() => editMode() === "delete" && props.removeVertex(i)}
+            />
+          )}
+        <Show when={props.showLetters}>
+          <Index each={props.graph.layout}>
+            {(pos, i) =>
+              <text
+                x={200 * pos().x}
+                y={200 * pos().y + 4}
+                text-anchor="middle"
+                class="graphtext pointer-events-none touch-none select-none"
+              > {alphabet[i]}
+            }
+        <Show when={editMode() == "adde" && selectedVertex() !== null && pointerPosition()}>
+          <line
+            x1={200 * selectedPosition().x}
+            y1={200 * selectedPosition().y}
+            x2={200 * pointerPosition()!.x}
+            y2={200 * pointerPosition()!.y}
+            class="stroke-1 stroke-blue-500 pointer-events-none"
+          />
+    <div class="btngroup">
+      <button .btn.rounded-l-md onClick=[setEditMode, "move"]>Déplacer
+      <button .btn onClick=[setEditMode, "addv"]>Ajouter sommet
+      <button .btn onClick=[setEditMode, "adde"]>Ajouter arête
+      <button .btn onClick=[setEditMode, "delete"]>Retirer
+      <button .btn onClick=props.clearGraph>Tout effacer
+      <button .btn rounded-r-md onClick=props.reinitGraph>Réinitialiser
+
+export default GraphView;

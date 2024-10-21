@@ -1,0 +1,103 @@
+import take from 'lodash.take'
+import { Component, Show } from 'solid-js'
+import { Algo, CustomAlgo, Result } from '../model.civet'
+import ResultView from './Result.civet'
+
+alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+type ConfigComponent = Component<{
+  selectedAlgorithm: Algo
+  currentStep: number
+  results: Result[]
+  selectedResultIndex: number,
+  showLetters: boolean
+  setGraph: (idx: number) => void
+  setAlgo: (type: string) => void
+  setCustomOrdering: (type: string) => void
+  compute: => void
+  previousStep: => void
+  nextStep: => void
+  finishColoring: => void
+  setResultIndex: (idx: number) => void
+  saveGraph: => void
+  openImportDialog: => void
+  exportGraph: => void
+}>
+
+Config: ConfigComponent := (props) =>
+  partialOrdering := =>
+    result := props.results[props.selectedResultIndex]
+    if  !result
+      ""
+    else 
+      take(result.coloring.map(alphabet[&.vertex]), props.currentStep).join("")
+
+  algoOrdering := =>
+    (props.selectedAlgorithm as CustomAlgo).ordering.map(alphabet[&]).join("")
+
+  <div class="flex flex-col">
+    <span class="config-title">Graphe</span>
+    <select class="select"
+      value="0"
+      onChange={(e) => props.setGraph Number e.currentTarget.value}
+    >
+      <option value="0">Cygne
+      <option value="1">Confluence
+      <option value="2">Lapin
+      <option value="3">Poisson
+      <option value="4">Gros graphe
+      <option value="5">Graphe personnalisé 1
+      <option value="6">Graphe personnalisé 2
+      <option value="7">Graphe personnalisé 3
+    <div .btngroup>
+      <button .btn.rounded-l-md onClick=props.saveGraph>Sauvegarder
+      <button .btn onClick=props.openImportDialog>Importer</button>
+      <button .btn.rounded-r-md onClick=props.exportGraph>Exporter
+    <span class="config-title">Ordre
+    <select
+      class="select"
+      value={props.selectedAlgorithm.type}
+      onChange={(e) => props.setAlgo e.currentTarget.value}
+    >
+      <option value="alpha">Alphabétique
+      <option value="decdegree">Degré décroissant
+      <option value="indset">Stables
+      <option value="dsatur">DSatur
+      <option value="custom">Personnalisé
+    <Show when={props.selectedAlgorithm.type === "custom" && props.showLetters}>
+      <input 
+        class="textinput"
+        value=algoOrdering()
+        onChange={(e) => props.setCustomOrdering(e.currentTarget.value)}
+        type="text"
+      />
+    <button .btn onClick={props.compute}>Choisir
+    <span .config-title>Résultats
+    <ul class="ml-4 list-disc">
+      {[0..4].map (i) =>
+        <ResultView
+          idx={i}
+          result={props.results[i]}
+          selected={props.selectedResultIndex == i}
+          onClick={[props.setResultIndex, i]}
+        />
+      }
+    <div .btngroup>
+      <button
+        class="btn rounded-l-md"
+        disabled={props.results.length === 0}
+        onClick=props.previousStep
+      > Etape précédente
+      <button
+        class="btn"
+        disabled={props.results.length === 0}
+        onClick=props.nextStep
+      > Etape suivante
+      <button
+        class="btn rounded-r-md"
+        disabled={props.results.length === 0}
+        onClick=props.finishColoring
+      > Terminer la coloration
+    {props.showLetters && <span .text-xl>{partialOrdering()}}
+
+export default Config

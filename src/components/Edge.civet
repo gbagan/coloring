@@ -1,11 +1,11 @@
 import { Component } from "solid-js"
 
 type EdgeComponent = Component<{
-  coords: {x1: number, x2: number, y1: number, y2: number},
-  onClick: () => void
+  coords: {x1: number, x2: number, y1: number, y2: number}
+  onClick: =>
 }>
   
-const Edge: EdgeComponent = props =>
+Edge: EdgeComponent := (props) =>
   <line
     x1={200 * props.coords.x1}
     x2={200 * props.coords.x2}
@@ -15,4 +15,4 @@ const Edge: EdgeComponent = props =>
     onClick={props.onClick}
   />
 
-export default Edge;
+export default Edge
