@@ -12,13 +12,6 @@
   "license": "MIT",
   "devDependencies": {
     "@danielx/civet": "^0.8.4",
-    "@types/lodash.max": "^4.0.9",
-    "@types/lodash.maxby": "^4.6.9",
-    "@types/lodash.range": "^3.2.9",
-    "@types/lodash.take": "^4.1.9",
-    "@types/lodash.times": "^4.3.9",
-    "@types/lodash.uniq": "^4.5.9",
-    "@types/lodash.zip": "^4.2.9",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
@@ -27,13 +20,6 @@
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
-    "lodash.max": "^4.0.1",
-    "lodash.maxby": "^4.6.0",
-    "lodash.range": "^3.2.0",
-    "lodash.take": "^4.1.1",
-    "lodash.times": "^4.3.2",
-    "lodash.uniq": "^4.5.0",
-    "lodash.zip": "^4.2.0",
     "solid-js": "^1.8.23",
     "solid-toast": "^0.5.0"
   }

@@ -1,4 +1,3 @@
-import take from 'lodash.take'
 import { Component, Show } from 'solid-js'
 import { Algo, CustomAlgo, Result } from '../model.civet'
 import ResultView from './Result.civet'
@@ -11,26 +10,26 @@ type ConfigComponent = Component<{
   results: Result[]
   selectedResultIndex: number,
   showLetters: boolean
-  setGraph: (idx: number) => void
-  setAlgo: (type: string) => void
-  setCustomOrdering: (type: string) => void
-  compute: => void
-  previousStep: => void
-  nextStep: => void
-  finishColoring: => void
-  setResultIndex: (idx: number) => void
-  saveGraph: => void
-  openImportDialog: => void
-  exportGraph: => void
+  setGraph: (idx: number) =>
+  setAlgo: (type: string) =>
+  setCustomOrdering: (type: string) =>
+  compute: =>
+  previousStep: =>
+  nextStep: =>
+  finishColoring: =>
+  setResultIndex: (idx: number) =>
+  saveGraph: =>
+  openImportDialog: =>
+  exportGraph: =>
 }>
 
 Config: ConfigComponent := (props) =>
   partialOrdering := =>
     result := props.results[props.selectedResultIndex]
-    if  !result
+    if !result
       ""
     else 
-      take(result.coloring.map(alphabet[&.vertex]), props.currentStep).join("")
+      result.coloring.map(alphabet[&.vertex]).slice(0, props.currentStep).join("")
 
   algoOrdering := =>
     (props.selectedAlgorithm as CustomAlgo).ordering.map(alphabet[&]).join("")

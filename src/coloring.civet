@@ -1,9 +1,5 @@
-import { replicate } from './util.civet'
+import { maxBy, replicate, zip3 } from './util.civet'
 import { AdjGraph } from "./graph.civet"
-import range from "lodash.range"
-import zip from "lodash.zip"
-import uniq from "lodash.uniq"
-import maxBy from "lodash.maxby"
 
 export type Coloring = { vertex: number, color: number }[];
 
@@ -27,14 +23,14 @@ export function customColoring(graph: AdjGraph, ordering: number[]): Coloring
   ordering.map (v) => {vertex: v, color: coloring[v]}
 
 export alphabeticalColoring := (graph: AdjGraph) =>
-  customColoring graph, range(0, graph.length)
+  customColoring graph, [0...graph.length]
 
 export decreasingDegreeColoring := (graph: AdjGraph) => 
-  ordering := range(0, graph.length).toSorted((a, b) => graph[b].length - graph[a].length)
+  ordering := [0...graph.length].toSorted((a, b) => graph[b].length - graph[a].length)
   customColoring graph, ordering
 
 export indSetColoring := (graph: AdjGraph) =>
-  ordering := range(0, graph.length).toSorted((a, b) => graph[b].length - graph[a].length);
+  ordering := [0...graph.length].toSorted((a, b) => graph[b].length - graph[a].length);
   result: Coloring := []
   color .= 0
   colored := replicate graph.length, false
@@ -50,13 +46,25 @@ export indSetColoring := (graph: AdjGraph) =>
     color++
   result
 
+nbDistinct := (xs: number[]) =>
+  ys := xs.toSorted (a, b) => a - b
+  n := ys.length
+  res .= 0
+  last .= null
+  for i .= 0; i < n; i++
+    if ys[i] !== last
+      res++
+    last = ys[i]
+  res
+  
+
 function dsaturStep(graph: AdjGraph, colors: number[]): number | null
   order :=
-    zip(range(0, graph.length), graph, colors) 
+    zip3([0...graph.length], graph, colors) 
     .filter [,,color] => color === -1
     .map [v, nbor] =>
       vertex: v!
-      saturation: uniq(nbor!.map(colors[&]).filter(& !== -1)).length
+      saturation: nbor!.map(colors[&]).filter(& !== -1) |> nbDistinct
       degree: nbor!.length
   maxBy(order, (o)=>o.saturation*10000+o.degree)?.vertex ?? null
 

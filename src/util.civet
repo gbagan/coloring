@@ -1,7 +1,32 @@
 export function replicate<A>(n: number, val: A): A[]
-  let arr = new Array n
+  arr := new Array n
   arr.fill val
   arr
+
+export function times<A>(n: number, f: (i: number) => A): A[]
+  arr := new Array n
+  for i .= 0; i < n; i++
+    arr[i] = f(i)
+  arr
+
+export function maxBy<A>(xs: A[], f: (f: A) => number): A | null
+  res .= null
+  best .= -Infinity
+  n := xs.length
+  for i .= 0; i < n; i++
+    c := f(xs[i])
+    if c > best
+      best = c
+      res = xs[i]
+  res
+
+
+export function zip3<A, B, C>(xs: A[], ys: B[], zs: C[]): [A, B, C][]
+  n := Math.min(xs.length, ys.length, zs.length)
+  res := new Array(n)
+  for i .= 0; i < n; i++
+    res[i] = [xs[i], ys[i], zs[i]]
+  res
 
 export pseudoRandom := (n: number) =>
   m := 100 * Math.sin(n + 1)

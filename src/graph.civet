@@ -1,5 +1,4 @@
-import times from "lodash.times"
-import { pseudoRandom } from "./util.civet"
+import { pseudoRandom, times } from "./util.civet"
 
 export type Edge = [number, number]
 
