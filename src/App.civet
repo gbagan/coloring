@@ -1,4 +1,4 @@
-import { replicate } from './util.civet'
+import { max, replicate } from './util.civet'
 import { createMemo, Component, batch } from 'solid-js'
 import { createStore, produce } from "solid-js/store"
 import Card from './components/Card.civet'
@@ -57,7 +57,7 @@ App: Component := =>
     res := {
       algorithm: state.selectedAlgorithm
       coloring
-      nbColors: 1 + (Math.max(...coloring.map(&.color)) ?? -1)
+      nbColors: 1 + (max(coloring.map(&.color)) ?? -1)
       showNbColors: false
     }
     batch =>

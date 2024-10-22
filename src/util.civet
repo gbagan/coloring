@@ -1,20 +1,23 @@
-export function replicate<A>(n: number, val: A): A[]
-  arr := new Array n
+export replicate := <A>(n: number, val: A) =>
+  arr: A[] := new Array n
   arr.fill val
   arr
 
-export function times<A>(n: number, f: (i: number) => A): A[]
-  arr := new Array n
+export times := <A>(n: number, f: (i: number) => A) =>
+  arr: A[] := new Array n
   for i .= 0; i < n; i++
-    arr[i] = f(i)
+    arr[i] = f i
   arr
 
-export function maxBy<A>(xs: A[], f: (f: A) => number): A | null
+export max := (xs: number[]) =>
+  if xs.length === 0 then null else Math.max(...xs)
+
+export maxBy := <A>(xs: A[], f: (f: A) => number) =>
   res .= null
   best .= -Infinity
   n := xs.length
   for i .= 0; i < n; i++
-    c := f(xs[i])
+    c := f xs[i]
     if c > best
       best = c
       res = xs[i]
