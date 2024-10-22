@@ -166,8 +166,8 @@ loadGraph := (idx: number) =>
   else 
     jsonToGraph(json) ?? emptyGraph()
 
-graphFns: (() => Graph)[] := [graph1, graph2, graph3, graph4, bigGraph, => loadGraph(5), => loadGraph(6), => loadGraph(7)]
+graphFns: (=> Graph)[] := [graph1, graph2, graph3, graph4, bigGraph, => loadGraph(5), => loadGraph(6), => loadGraph(7)]
 
 export genGraph := (i: number) => graphFns[i]()
 
-export initialGraphs: Graph[] := [graph1(), graph2(), graph3(), graph4(), bigGraph(), loadGraph(5), loadGraph(6), loadGraph(7)]
+export initialGraphs := [graph1(), graph2(), graph3(), graph4(), bigGraph(), loadGraph(5), loadGraph(6), loadGraph(7)]

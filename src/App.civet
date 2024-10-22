@@ -47,7 +47,7 @@ App: Component := =>
     if ordering !== null
       setState "selectedAlgorithm", { type: "custom", ordering }
 
-  compute := () =>
+  compute := =>
     algo := state.selectedAlgorithm
     if  algo.type === "custom" && !isValidOrdering(algo.ordering)
       return
@@ -103,22 +103,22 @@ App: Component := =>
       .readText()
       .then((text) =>
         setState "dialogContent", text
-      ).catch(() =>
+      ).catch(=>
         setState "dialogContent", ""
-      ).finally(() =>
-        importDialog.showModal();
+      ).finally(=>
+        importDialog.showModal()
       )
 
   importGraph := =>
     json := state.dialogContent
     graph := G.jsonToGraph json
     if graph === null
-      toast.error "Le texte que vous avez entré ne représente pas un graph valide"
+      toast.error "Le texte que vous avez entré ne représente pas un graphe valide"
     else
       setState "graphs", state.selectedGraphIdx, graph
     importDialog.close()
 
-  exportGraph := () =>
+  exportGraph := =>
     navigator.clipboard.writeText JSON.stringify graph()
     toast.success("Le graphe a été copié dans le presse-papier")
 
@@ -154,7 +154,7 @@ App: Component := =>
   clearGraph := =>
     setState "graphs", state.selectedGraphIdx, { layout: [], edges: [] }
 
-  reinitGraph := () =>
+  reinitGraph := =>
     setState "graphs", state.selectedGraphIdx, G.genGraph(state.selectedGraphIdx)
 
 

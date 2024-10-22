@@ -16,13 +16,13 @@ type GraphComponent = Component<{
   graph: Graph
   colors: number[]
   showLetters: boolean
-  addVertex: (pos: Position) => void
-  moveVertex: (idx: number, pos: Position) => void
-  addEdge: (u: number, v: number) => void
-  removeVertex: (idx: number) => void
-  removeEdge: (edge: Edge) => void
-  clearGraph: () => void
-  reinitGraph: () => void
+  addVertex: (pos: Position) =>
+  moveVertex: (idx: number, pos: Position) =>
+  addEdge: (u: number, v: number) =>
+  removeVertex: (idx: number) =>
+  removeEdge: (edge: Edge) =>
+  clearGraph: =>
+  reinitGraph: =>
 }>
 
 GraphView: GraphComponent := (props) =>
@@ -58,22 +58,21 @@ GraphView: GraphComponent := (props) =>
 
   <div>
     <div class="w-[160] touch-none">
-      <svg
+      <svg .block
         viewBox="0 0 200 200"
-        class="block"
         classList={{deletemode: editMode() === "delete"}}
         onPointerMove={move}
-        onPointerUp={() => editMode() === "adde" && setSelectedVertex(null)}
+        onPointerUp={=> editMode() === "adde" && setSelectedVertex(null)}
         onClick={(e) => editMode() === "addv" && props.addVertex(getPointerPosition(e))}
       >
-        <For each={props.graph.edges}>
+        <For each=props.graph.edges>
           {(edge) =>
             <EdgeView
               coords={getCoordsOfEdge(props.graph, edge)}
-              onClick={() => editMode() === "delete" && props.removeEdge(edge)}
+              onClick={=> editMode() === "delete" && props.removeEdge(edge)}
             />
           }
-        <Index each={props.graph.layout}>
+        <Index each=props.graph.layout>
           {(pos, i) => (
             <circle
               cx={200 * pos().x}
@@ -82,10 +81,10 @@ GraphView: GraphComponent := (props) =>
               class={(colors[props.colors[i]] ?? "fill-white") + " stroke-1 stroke-black vertex"}
               onPointerDown={[pointerDown, i]}
               onPointerUp={[pointerUp, i]}
-              onClick={() => editMode() === "delete" && props.removeVertex(i)}
+              onClick={=> editMode() === "delete" && props.removeVertex(i)}
             />
           )}
-        <Show when={props.showLetters}>
+        <Show when=props.showLetters>
           <Index each={props.graph.layout}>
             {(pos, i) =>
               <text
