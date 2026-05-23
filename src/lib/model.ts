@@ -1,4 +1,4 @@
-import { type Graph, initialGraphs, toAdjGraph } from "./graph"
+import { type Graph, toAdjGraph } from "./graph"
 import { alphabeticalColoring, type Coloring, customColoring, decreasingDegreeColoring,
         dsatur, indSetColoring } from "./coloring";
 

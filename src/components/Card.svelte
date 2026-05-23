@@ -16,9 +16,10 @@
 
 <style>
   .card {
-    border-radius: 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow);
     padding: 1rem;
   }
 

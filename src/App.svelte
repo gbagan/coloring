@@ -255,19 +255,27 @@
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
   }
 
   .graph-container {
     width: 40rem;
     touch-action: none;
-    border: 1px solid var(--border);
+  }
+
+  .colors {
+    width: 8rem;
   }
 
   dialog {
     border: none;
     background-color: #ffffff;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    box-shadow: var(--shadow);
   }
 
   dialog::backdrop {
@@ -294,10 +302,6 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-  }
-
-  .colors {
-    width: 8rem;
   }
 
   .color-text {
