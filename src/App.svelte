@@ -272,6 +272,10 @@
   }
 
   dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
     border: none;
     background-color: #ffffff;
     border-radius: 0.5rem;
