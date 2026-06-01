@@ -310,7 +310,7 @@
 
   .color-text {
     font: bold 12px sans-serif;
-    fill: var(--gray-900);
+    fill: var(--text);
     pointer-events: none;
     touch-action: none;
     user-select: none;

@@ -125,7 +125,7 @@
 
 <style>
   .vertex {
-    stroke: black;
+    stroke: var(--text);
     stroke-width: 1;
   }
 
@@ -136,7 +136,7 @@
 
   .text {
     font: bold 12px sans-serif;
-    fill: black;
+    fill: var(--text);
     pointer-events: none;
     touch-action: none;
     user-select: none;

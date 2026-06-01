@@ -39,10 +39,7 @@
   button {
     color: inherit;
     font-size: 1rem;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background-color: transparent;
+    cursor: pointer;
   }
 
   .selected {

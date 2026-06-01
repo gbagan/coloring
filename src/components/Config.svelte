@@ -78,7 +78,7 @@
   {/if}
   <button class="btn" onclick={compute}>Choisir</button>
   <h2>Résultats</h2>
-  <ul class="ml-4 list-disc">
+  <ul>
     {#each [0, 1, 2, 3, 4] as i}
       <ResultView
         result={results[i]}
@@ -126,6 +126,6 @@
     margin-top: 1rem;
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--gray-900);
+    color: var(--text);
   }
 </style>
