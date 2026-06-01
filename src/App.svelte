@@ -259,7 +259,7 @@
     padding: 1.5rem;
     background-color: #ffffff;
     border-radius: 0.5rem;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-md);
   }
 
   .graph-container {
@@ -279,7 +279,7 @@
     border: none;
     background-color: #ffffff;
     border-radius: 0.5rem;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
   }
 
   dialog::backdrop {
